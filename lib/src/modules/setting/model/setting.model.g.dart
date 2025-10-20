@@ -15,7 +15,7 @@ extension GetAppSettingCollection on Isar {
 
 const AppSettingSchema = CollectionSchema(
   name: r'AppSetting',
-  id: -948339,
+  id: -948817443998796339,
   properties: {
     r'firstRun': PropertySchema(
       id: 0,
@@ -40,7 +40,7 @@ const AppSettingSchema = CollectionSchema(
   getId: _appSettingGetId,
   getLinks: _appSettingGetLinks,
   attach: _appSettingAttach,
-  version: '3.1.0+1',
+  version: '3.3.0-dev.3',
 );
 
 int _appSettingEstimateSize(

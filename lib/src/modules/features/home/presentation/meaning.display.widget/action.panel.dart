@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 class ActionPanel extends StatefulWidget {
@@ -29,12 +28,7 @@ class _ActionPanelState extends State<ActionPanel> {
             // print(await _flutterTts.getLanguages);
             _flutterTts.speak(widget.text!);
           },
-          icon: SvgPicture.asset(
-            'assets/icons/volume_solid.svg',
-            height: 40,
-            width: 40,
-            colorFilter: const ColorFilter.mode(Colors.blue, BlendMode.srcIn),
-          ),
+          icon: Icon(Icons.speaker),
         ),
         const IconButton(icon: Icon(Icons.copy), onPressed: null),
         const IconButton(icon: Icon(Icons.bookmark), onPressed: null),

@@ -1,6 +1,8 @@
 import 'dart:convert' show json;
 
-import 'package:isar/isar.dart';
+ 
+
+import 'package:isar_community/isar.dart';
 
 import '../../../theme/model/theme.model.dart';
 
