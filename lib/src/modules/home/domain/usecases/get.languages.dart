@@ -1,6 +1,6 @@
 import 'package:translator/src/core/usecase/usecase.dart';
-import 'package:translator/src/modules/features/home/domain/entities/language.entity.dart';
-import 'package:translator/src/modules/features/home/domain/repositories/translation.repository.dart';
+import 'package:translator/src/modules/home/domain/entities/language.entity.dart';
+import 'package:translator/src/modules/home/domain/repositories/translation.repository.dart';
 
 class GetLanguageUseCase implements AsyncUseCase<List<LanguageEntity>, void> {
   final TranslationRepository _translationRepository;

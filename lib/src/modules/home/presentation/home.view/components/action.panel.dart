@@ -21,6 +21,7 @@ class _ActionPanelState extends State<ActionPanel> {
   Widget build(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.min,
       children: [
         IconButton(
           onPressed: () async {

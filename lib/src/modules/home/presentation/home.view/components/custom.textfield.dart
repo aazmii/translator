@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({super.key, required this.text, this.readOnly, this.showLoader = false});
+  const CustomTextField({super.key, this.text, this.readOnly, this.showLoader = false});
   final String? text;
   final bool? readOnly, showLoader;
 
@@ -15,10 +15,8 @@ class CustomTextField extends StatelessWidget {
             expands: true,
             maxLines: null,
             textAlignVertical: TextAlignVertical.top,
-            decoration: const InputDecoration(
-              fillColor: Colors.transparent,
-              filled: true,
-              focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.transparent)),
+            decoration: InputDecoration(
+              contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),
             ),
           ),
           if (showLoader!) const Center(child: CircularProgressIndicator())

@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+
+import 'action.panel.dart';
+import 'custom.textfield.dart';
+
+class TranslationDisplayWidget extends StatelessWidget {
+  const TranslationDisplayWidget({super.key, this.sourceText, this.targetText});
+  final String? sourceText, targetText;
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Card(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: CustomTextField(text: sourceText)),
+                ActionPanel(text: targetText),
+              ],
+            ),
+          ),
+        ),
+        const Divider(),
+        Expanded(
+          child: Card(
+            child: Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    text: targetText,
+                    // text:  word.meanings?.isNotEmpty? word.meanings?.first.definitions?.first.definition ?? '',
+                    readOnly: true,
+                    // showLoader: true,
+                  ),
+                ),
+                ActionPanel(text: targetText),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

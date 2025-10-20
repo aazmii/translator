@@ -1,5 +1,5 @@
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:translator/src/modules/features/home/domain/entities/language.entity.dart';
+import 'package:translator/src/modules/home/domain/entities/language.entity.dart';
 
 import '../../domain/repositories/translation.repository.dart';
 
