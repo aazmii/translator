@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart' show BuildContext, MaterialApp, MediaQuery, TextScaler, Widget;
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ConsumerWidget, WidgetRef;
-import 'package:translator/src/localization/app_localizations.dart';
-import 'constants/constants.dart' show appName;
-import 'extensions/extensions.dart' show BuildContextExtension;
-import 'localization/loalization.dart' show localizationsDelegates, onGenerateTitle, supportedLocales, t;
-import 'modules/router/view/router.dart' show AppRouter;
+import 'package:translator/src/config/localization/app_localizations.dart';
+import 'core/constants/constants.dart' show appName;
+import 'core/extensions/extensions.dart' show BuildContextExtension;
+import 'config/localization/loalization.dart' show localizationsDelegates, onGenerateTitle, supportedLocales, t;
+import 'config/router/view/router.dart' show AppRouter;
 import 'theme/model/theme.model.dart' show ThemeProfileExtension;
 import 'theme/provider/theme.provider.dart' show themeProvider;
 

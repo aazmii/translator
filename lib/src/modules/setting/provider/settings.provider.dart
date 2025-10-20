@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../db/isar.dart';
+import '../../../core/db/isar.dart';
 import '../model/setting.model.dart';
 
 final _settingsStream = db.appSettings.watchObject(0, fireImmediately: true);
