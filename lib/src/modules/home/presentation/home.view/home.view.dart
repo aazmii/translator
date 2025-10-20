@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'components/language.selector/language.selector.tile.dart';
 import 'components/translation.card.dart';
 
 class HomeView extends StatelessWidget {
@@ -8,7 +9,8 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Translator')),
+      appBar: HomeAppbar(),
+      drawer: Drawer(),
       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(8.0),
