@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/source.card/source.action.panel.dart';
 
-import 'action.panel.dart';
+import 'target.card/action.panel.dart';
 import 'custom.textfield.dart';
 
 class TranslationDisplayWidget extends StatelessWidget {
@@ -16,7 +17,7 @@ class TranslationDisplayWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(child: CustomTextField(initialValue: sourceText)),
-                ActionPanel(text: targetText),
+                SourceActionPanel(text: targetText),
               ],
             ),
           ),
@@ -34,7 +35,7 @@ class TranslationDisplayWidget extends StatelessWidget {
                     // showLoader: true,
                   ),
                 ),
-                ActionPanel(text: targetText),
+                TargetActionPanel(text: targetText),
               ],
             ),
           ),

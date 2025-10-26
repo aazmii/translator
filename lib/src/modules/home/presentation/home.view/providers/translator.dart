@@ -29,6 +29,10 @@ class Translator extends _$Translator {
     );
   }
 
+  void clear() {
+    state = state.copyWith(sourceText: null, translatedText: null);
+  }
+
   void setSourceText(String? s) {
     state = state.copyWith(sourceText: s);
   }
@@ -50,18 +54,26 @@ class TranslaorModel {
     required this.targetLanguage,
     this.sourceText,
     this.translatedText,
-  }) : translator = OnDeviceTranslator(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
 
+    //     Object? name = _noValue,
+    // Object? age = _noValue,
+  }) : translator = OnDeviceTranslator(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
+  static const _noValue = Object();
   TranslaorModel copyWith({
     TranslateLanguage? sourceLanguage,
     TranslateLanguage? targetLanguage,
-    String? sourceText,
-    String? translatedText,
+    Object? sourceText = _noValue,
+    Object? translatedText = _noValue,
+
+    // String? sourceText,
+    // String? translatedText,
   }) =>
       TranslaorModel(
         sourceLanguage: sourceLanguage ?? this.sourceLanguage,
         targetLanguage: targetLanguage ?? this.targetLanguage,
-        sourceText: sourceText,
-        translatedText: translatedText,
+        sourceText: sourceText == _noValue ? this.sourceText : sourceText as String?,
+        translatedText: translatedText == _noValue ? this.translatedText : translatedText as String?,
+        //        name: name == _noValue ? this.name : name as String?,
+        // age: age == _noValue ? this.age : age as int?,
       );
 }

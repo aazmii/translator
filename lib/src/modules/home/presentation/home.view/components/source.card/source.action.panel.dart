@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import '../providers/translator.dart';
+import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
 
-class ActionPanel extends StatefulWidget {
-  const ActionPanel({super.key, this.text});
+import '../../providers/translator.dart';
+
+class SourceActionPanel extends StatefulWidget {
+  const SourceActionPanel({super.key, this.text, this.controller});
+  final TextEditingController? controller;
   final String? text;
   @override
-  State<ActionPanel> createState() => _ActionPanelState();
+  State<SourceActionPanel> createState() => _ActionPanelState();
 }
 
-class _ActionPanelState extends State<ActionPanel> {
+class _ActionPanelState extends State<SourceActionPanel> {
   final _flutterTts = FlutterTts();
   Map<String, String>? voice;
   @override
   void initState() {
     super.initState();
+
     _initTTS();
   }
 
@@ -25,6 +28,21 @@ class _ActionPanelState extends State<ActionPanel> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.min,
       children: [
+        Consumer(
+          builder: (context, ref, child) {
+            final sourceText = ref.watch(translatorProvider).sourceText;
+            return sourceText != null && sourceText.isNotEmpty
+                ? IconButton(
+                    onPressed: () {
+                      ref.read(translatorProvider.notifier).clear();
+                      widget.controller?.clear();
+                      FocusScope.of(context).requestFocus();
+                    },
+                    icon: Icon(Icons.close),
+                  )
+                : SizedBox.shrink();
+          },
+        ),
         IconButton(
           onPressed: () async {
             if (widget.text == null) return;
@@ -35,6 +53,7 @@ class _ActionPanelState extends State<ActionPanel> {
         ),
         const IconButton(icon: Icon(Icons.copy), onPressed: null),
         const IconButton(icon: Icon(Icons.bookmark), onPressed: null),
+        Spacer(),
         Consumer(builder: (context, ref, child) {
           return IconButton(
               onPressed: () async {

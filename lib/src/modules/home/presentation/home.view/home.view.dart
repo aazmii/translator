@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'components/language.selector/language.selector.tile.dart';
-import 'components/translation.card.dart';
+import 'components/source.card/souce.card.dart';
+import 'components/target.card/target.card.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
