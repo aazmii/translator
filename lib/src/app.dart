@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart' show BuildContext, MaterialApp, MediaQuery, TextScaler, Widget;
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ConsumerWidget, WidgetRef;
-import 'package:translator/src/config/localization/app_localizations.dart';
+import 'package:go_translator/src/config/localization/app_localizations.dart';
 import 'core/constants/constants.dart' show appName;
 import 'core/extensions/extensions.dart' show BuildContextExtension;
 import 'config/localization/loalization.dart' show localizationsDelegates, onGenerateTitle, supportedLocales, t;

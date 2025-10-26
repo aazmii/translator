@@ -1,9 +1,9 @@
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:translator/src/modules/home/domain/entities/language.entity.dart';
+import 'package:go_translator/src/modules/home/domain/entities/language.entity.dart';
 
 import '../../domain/repositories/translation.repository.dart';
 
-class TranslationRepositoryImpl implements TranslationRepository {
+class TranslationRepositoryImpl implements OfflineTranslationRepository {
   final _modelManager = OnDeviceTranslatorModelManager();
   @override
   Future<List<LanguageEntity>> getAvailableLanguages() async {
