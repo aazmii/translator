@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import '../providers/translator.dart';
 
 class ActionPanel extends StatefulWidget {
   const ActionPanel({super.key, this.text});
@@ -33,7 +35,14 @@ class _ActionPanelState extends State<ActionPanel> {
         ),
         const IconButton(icon: Icon(Icons.copy), onPressed: null),
         const IconButton(icon: Icon(Icons.bookmark), onPressed: null),
-        const IconButton(onPressed: null, icon: Icon(Icons.send)),
+        Consumer(builder: (context, ref, child) {
+          return IconButton(
+              onPressed: () async {
+                await ref.read(translatorProvider.notifier).translate();
+                if (context.mounted) FocusScope.of(context).unfocus();
+              },
+              icon: Icon(Icons.send));
+        }),
       ],
     );
   }

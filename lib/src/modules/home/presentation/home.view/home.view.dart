@@ -16,9 +16,9 @@ class HomeView extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            Expanded(child: TranslationCard()),
+            Expanded(child: SourceCard()),
             SizedBox(height: 8),
-            Expanded(child: TranslationCard()),
+            Expanded(child: TargetCard()),
           ],
         ),
       ),

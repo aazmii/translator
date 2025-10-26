@@ -15,7 +15,7 @@ class TranslationDisplayWidget extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(child: CustomTextField(text: sourceText)),
+                Expanded(child: CustomTextField(initialValue: sourceText)),
                 ActionPanel(text: targetText),
               ],
             ),
@@ -28,7 +28,7 @@ class TranslationDisplayWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: CustomTextField(
-                    text: targetText,
+                    initialValue: targetText,
                     // text:  word.meanings?.isNotEmpty? word.meanings?.first.definitions?.first.definition ?? '',
                     readOnly: true,
                     // showLoader: true,

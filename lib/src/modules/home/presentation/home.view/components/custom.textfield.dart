@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
-  const CustomTextField({super.key, this.text, this.readOnly, this.showLoader = false});
-  final String? text;
+  const CustomTextField({super.key, this.initialValue, this.readOnly, this.showLoader = false, this.onChanged});
+  final String? initialValue;
   final bool? readOnly, showLoader;
+  final ValueChanged<String>? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -11,9 +12,11 @@ class CustomTextField extends StatelessWidget {
       child: Stack(
         children: [
           TextFormField(
-            initialValue: text,
+            key: ValueKey(initialValue),
+            initialValue: initialValue,
             expands: true,
             maxLines: null,
+            onChanged: onChanged,
             textAlignVertical: TextAlignVertical.top,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),
