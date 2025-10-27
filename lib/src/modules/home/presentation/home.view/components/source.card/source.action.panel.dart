@@ -48,6 +48,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
           Spacer(),
           IconButton(
             onPressed: () async {
+              ref.read(translatorProvider.notifier).setSourceText(widget.controller?.text ?? '');
               await ref.read(translatorProvider.notifier).translate();
               if (context.mounted) FocusScope.of(context).unfocus();
             },

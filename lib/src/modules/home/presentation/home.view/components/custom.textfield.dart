@@ -6,14 +6,14 @@ class CustomTextField extends StatelessWidget {
     // this.initialValue,
     this.readOnly,
     this.showLoader = false,
-    this.onChanged,
+    // this.onChanged,
     this.controller,
     this.autofocus = false,
     this.focusNode
   });
   // final String? initialValue;
   final bool? readOnly, showLoader;
-  final ValueChanged<String>? onChanged;
+  // final ValueChanged<String>? onChanged;
   final TextEditingController? controller;
   final bool? autofocus;
   final FocusNode? focusNode;
@@ -30,7 +30,7 @@ class CustomTextField extends StatelessWidget {
             // initialValue: initialValue,
             expands: true,
             maxLines: null,
-            onChanged: onChanged,
+            // onChanged: onChanged,
             textAlignVertical: TextAlignVertical.top,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),

@@ -22,7 +22,7 @@ class Translator extends _$Translator {
     );
   }
 
-  void swapLanguage() async {
+  Future<void> swapLanguage() async {
     state = state.copyWith(
       sourceLanguage: state.targetLanguage,
       targetLanguage: state.sourceLanguage,
@@ -39,6 +39,7 @@ class Translator extends _$Translator {
   }
 
   Future<void> translate() async {
+    if (state.sourceText == null || state.sourceText!.isEmpty) return;
     final translatedText = await _translator.translateText(state.translator, state.sourceText!);
     state = state.copyWith(translatedText: translatedText);
   }

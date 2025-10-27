@@ -18,7 +18,10 @@ class _SourceCardState extends ConsumerState<SourceCard> {
   @override
   void initState() {
     super.initState();
-    sourceController = TextEditingController();
+    sourceController = TextEditingController()
+      ..addListener(() {
+        ref.read(translatorProvider.notifier).setSourceText(sourceController.text);
+      });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(Duration.zero, () {
@@ -45,7 +48,7 @@ class _SourceCardState extends ConsumerState<SourceCard> {
               focusNode: _focusNode,
               controller: sourceController,
               autofocus: true,
-              onChanged: ref.read(translatorProvider.notifier).setSourceText,
+              // onChanged: ref.read(translatorProvider.notifier).setSourceText,
             ),
           ),
           SourceActionPanel(controller: sourceController),

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/core/extensions/extensions.dart';
 
 import '../../providers/translator.dart';
+
 class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key});
 
@@ -12,7 +13,10 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
     final target = ref.watch(translatorProvider).targetLanguage;
     return AppBar(
       title: ListTile(
-        onTap: ref.read(translatorProvider.notifier).swapLanguage,
+        onTap: () {
+          FocusScope.of(context).unfocus();
+          ref.read(translatorProvider.notifier).swapLanguage();
+        },
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
