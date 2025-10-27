@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import '../../providers/translator.dart';
 
-class TargetActionPanel extends StatefulWidget {
+class TargetActionPanel extends ConsumerStatefulWidget {
   const TargetActionPanel({super.key, this.text});
   final String? text;
   @override
-  State<TargetActionPanel> createState() => _ActionPanelState();
+  ConsumerState<TargetActionPanel> createState() => _ActionPanelState();
 }
 
-class _ActionPanelState extends State<TargetActionPanel> {
+class _ActionPanelState extends ConsumerState<TargetActionPanel> {
   final _flutterTts = FlutterTts();
   Map<String, String>? voice;
   @override
@@ -21,32 +22,24 @@ class _ActionPanelState extends State<TargetActionPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final targetText = ref.watch(translatorProvider).translatedText;
+    if (targetText == null || targetText.isEmpty) return const SizedBox.shrink();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       mainAxisSize: MainAxisSize.min,
       children: [
+        IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: targetText))),
         IconButton(
-          onPressed: () async {
-            if (widget.text == null) return;
-            // print(await _flutterTts.getLanguages);
-            _flutterTts.speak(widget.text!);
-          },
+          onPressed: () async => await _flutterTts.speak(targetText),
           icon: Icon(Icons.speaker),
         ),
-        const IconButton(icon: Icon(Icons.copy), onPressed: null),
         const IconButton(icon: Icon(Icons.bookmark), onPressed: null),
-        Consumer(builder: (context, ref, child) {
-          return IconButton(
-              onPressed: () async {
-                await ref.read(translatorProvider.notifier).translate();
-                if (context.mounted) FocusScope.of(context).unfocus();
-              },
-              icon: Icon(Icons.send));
-        }),
+        const IconButton(icon: Icon(Icons.share), onPressed: null),
       ],
     );
   }
 
+  // TODO: init with proper language
   void _initTTS() async {
     var voices = await _flutterTts.getVoices;
 

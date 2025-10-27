@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_translator/src/modules/home/presentation/home.view/components/target.card/action.panel.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/target.card/target.action.panel.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/custom.textfield.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/providers/translator.dart';
 
@@ -27,7 +27,6 @@ class _TargetCardState extends ConsumerState<TargetCard> {
 
   @override
   Widget build(BuildContext context) {
-    // print(ref.watch(onDeviceTranslatorPProvider).translatedText);
     targetController.text = ref.watch(translatorProvider).translatedText ?? '';
     return Card(
       child: Row(

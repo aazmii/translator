@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/source.card/source.action.panel.dart';
 
-import 'target.card/action.panel.dart';
+import 'target.card/target.action.panel.dart';
 import 'custom.textfield.dart';
 
 class TranslationDisplayWidget extends StatelessWidget {

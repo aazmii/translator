@@ -22,11 +22,12 @@ class Translator extends _$Translator {
     );
   }
 
-  void swapLanguage() {
+  void swapLanguage() async {
     state = state.copyWith(
       sourceLanguage: state.targetLanguage,
       targetLanguage: state.sourceLanguage,
     );
+    await translate();
   }
 
   void clear() {
@@ -54,9 +55,6 @@ class TranslaorModel {
     required this.targetLanguage,
     this.sourceText,
     this.translatedText,
-
-    //     Object? name = _noValue,
-    // Object? age = _noValue,
   }) : translator = OnDeviceTranslator(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
   static const _noValue = Object();
   TranslaorModel copyWith({
@@ -64,16 +62,11 @@ class TranslaorModel {
     TranslateLanguage? targetLanguage,
     Object? sourceText = _noValue,
     Object? translatedText = _noValue,
-
-    // String? sourceText,
-    // String? translatedText,
   }) =>
       TranslaorModel(
         sourceLanguage: sourceLanguage ?? this.sourceLanguage,
         targetLanguage: targetLanguage ?? this.targetLanguage,
         sourceText: sourceText == _noValue ? this.sourceText : sourceText as String?,
         translatedText: translatedText == _noValue ? this.translatedText : translatedText as String?,
-        //        name: name == _noValue ? this.name : name as String?,
-        // age: age == _noValue ? this.age : age as int?,
       );
 }

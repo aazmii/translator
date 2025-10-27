@@ -16,9 +16,9 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            Text(source.name.capitalize),
+            Expanded(child: Center(child: Text(source.name.capitalize))),
             Icon(Icons.swap_horiz),
-            Text(target.name.capitalize),
+            Expanded(child: Center(child: Text(target.name.capitalize))),
           ],
         ),
       ),

@@ -41,12 +41,13 @@ class _SourceCardState extends ConsumerState<SourceCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-              child: CustomTextField(
-            focusNode: _focusNode,
-            controller: sourceController,
-            autofocus: true,
-            onChanged: ref.read(translatorProvider.notifier).setSourceText,
-          )),
+            child: CustomTextField(
+              focusNode: _focusNode,
+              controller: sourceController,
+              autofocus: true,
+              onChanged: ref.read(translatorProvider.notifier).setSourceText,
+            ),
+          ),
           SourceActionPanel(controller: sourceController),
         ],
       ),
