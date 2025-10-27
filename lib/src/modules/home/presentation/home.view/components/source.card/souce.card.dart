@@ -14,16 +14,23 @@ class SourceCard extends ConsumerStatefulWidget {
 
 class _SourceCardState extends ConsumerState<SourceCard> {
   late final TextEditingController sourceController;
+  final FocusNode _focusNode = FocusNode();
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     sourceController = TextEditingController();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(Duration.zero, () {
+        FocusScope.of(context).requestFocus(_focusNode);
+      });
+    });
   }
 
   @override
   dispose() {
     sourceController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -35,7 +42,9 @@ class _SourceCardState extends ConsumerState<SourceCard> {
         children: [
           Expanded(
               child: CustomTextField(
+            focusNode: _focusNode,
             controller: sourceController,
+            autofocus: true,
             onChanged: ref.read(translatorProvider.notifier).setSourceText,
           )),
           SourceActionPanel(controller: sourceController),
