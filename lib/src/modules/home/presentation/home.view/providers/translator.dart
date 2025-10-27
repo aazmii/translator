@@ -12,10 +12,10 @@ part 'translator.g.dart';
 
 @Riverpod(keepAlive: true)
 class Translator extends _$Translator {
-  late TranslationRepositoryImpl _translator;
+  late HomeRepositoryImpl _homeRepo;
   @override
   TranslaorModel build() {
-    _translator = TranslationRepositoryImpl();
+    _homeRepo = HomeRepositoryImpl();
     return TranslaorModel(
       sourceLanguage: TranslateLanguage.english,
       targetLanguage: TranslateLanguage.french,
@@ -40,7 +40,7 @@ class Translator extends _$Translator {
 
   Future<void> translate() async {
     if (state.sourceText == null || state.sourceText!.isEmpty) return;
-    final translatedText = await _translator.translateText(state.translator, state.sourceText!);
+    final translatedText = await _homeRepo.translateText(state.translator, state.sourceText!);
     state = state.copyWith(translatedText: translatedText);
   }
 }

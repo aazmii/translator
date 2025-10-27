@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'components/language.selector/language.selector.tile.dart';
+import 'components/home.app.bar/home.app.bar.dart';
+import 'components/home.drawer/home.drawer.dart' show HomeDrawer;
 import 'components/source.card/souce.card.dart';
 import 'components/target.card/target.card.dart';
 
@@ -11,7 +12,7 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HomeAppbar(),
-      drawer: Drawer(),
+      drawer: HomeDrawer(),
       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: const EdgeInsets.all(8.0),

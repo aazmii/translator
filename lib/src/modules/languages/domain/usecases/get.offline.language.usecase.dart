@@ -1,9 +1,10 @@
 import 'package:go_translator/src/core/usecase/usecase.dart';
-import 'package:go_translator/src/modules/home/domain/entities/language.entity.dart';
-import 'package:go_translator/src/modules/home/domain/repositories/translation.repository.dart';
+import 'package:go_translator/src/core/domain/entities/language.entity.dart';
+
+import '../repository/offline.translation.reopsitory.dart';
 
 class GetOfflineLanguageUseCase implements AsyncUseCase<List<LanguageEntity>, void> {
-  final OfflineTranslationRepository _translationRepository;
+  final OfflineLanguageRepository _translationRepository;
 
   GetOfflineLanguageUseCase(this._translationRepository);
 
