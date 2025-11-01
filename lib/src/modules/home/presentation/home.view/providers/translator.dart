@@ -27,7 +27,6 @@ class Translator extends _$Translator {
       sourceLanguage: state.targetLanguage,
       targetLanguage: state.sourceLanguage,
     );
-    await translate();
   }
 
   void clear() {
@@ -42,6 +41,19 @@ class Translator extends _$Translator {
     if (state.sourceText == null || state.sourceText!.isEmpty) return;
     final translatedText = await _homeRepo.translateText(state.translator, state.sourceText!);
     state = state.copyWith(translatedText: translatedText);
+  }
+
+  set setSourceLanguage(String code) {
+    if (code == state.targetLanguage.bcpCode) swapLanguage();
+    final sourceLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
+    state = state.copyWith(sourceLanguage: sourceLanguage);
+  }
+
+  set setTargetLanguage(String code) {
+    if (code == state.targetLanguage.bcpCode) swapLanguage();
+    final targetLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
+
+    state = state.copyWith(targetLanguage: targetLanguage);
   }
 }
 

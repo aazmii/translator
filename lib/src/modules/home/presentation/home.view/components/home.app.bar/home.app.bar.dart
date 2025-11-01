@@ -15,7 +15,6 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
     final target = ref.watch(translatorProvider).targetLanguage;
     return AppBar(
       title: ListTile(
-        onTap: () {},
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -30,9 +29,10 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
               ),
             ),
             IconButton(
-              onPressed: () {
+              onPressed: () async {
                 FocusScope.of(context).unfocus();
                 ref.read(translatorProvider.notifier).swapLanguage();
+                await ref.read(translatorProvider.notifier).translate();
               },
               icon: const Icon(Icons.swap_horiz),
             ),

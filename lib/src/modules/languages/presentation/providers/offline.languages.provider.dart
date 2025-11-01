@@ -4,14 +4,18 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../domain/repository/offline.translation.reopsitory.dart';
 part 'offline.languages.provider.g.dart';
+
 //TODO: instead of [OfflineLanguageRepository] use usecases
 @riverpod
 class OfflineLanguages extends _$OfflineLanguages {
   late OfflineLanguageRepository _repo;
+  late List<LanguageEntity> languageList;
   @override
   Future<List<LanguageEntity>> build() async {
     _repo = OfflineLanguageRepositoryImpl();
-    return await _repo.getAvailableLanguages();
+    languageList = await _repo.getAvailableLanguages();
+    final sorted = [...languageList.where((l) => l.isDownloaded), ...languageList.where((l) => !l.isDownloaded)];
+    return sorted;
   }
 
   Future<bool> deleteLanguage(String code) async {
