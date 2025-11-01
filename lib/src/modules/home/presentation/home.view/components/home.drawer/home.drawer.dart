@@ -12,7 +12,9 @@ class HomeDrawer extends StatelessWidget {
       child: Column(
         children: [
           DrawerHeader(child: Text('Go Translator')),
-          ListTile(onTap: () => fadePush(context, const OfflineLanguagesView()), title: Text('Offline Languages')),
+          ListTile(
+              onTap: () => fadePush(context, OfflineLanguagesView(title: 'Offline Languages')),
+              title: Text('Offline Languages')),
           ListTile(onTap: () => fadePush(context, const SettingView()), title: Text('Settings')),
         ],
       ),
