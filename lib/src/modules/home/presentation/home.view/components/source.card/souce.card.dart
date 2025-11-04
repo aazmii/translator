@@ -48,6 +48,7 @@ class _SourceCardState extends ConsumerState<SourceCard> {
               focusNode: _focusNode,
               controller: sourceController,
               autofocus: true,
+              hintText: 'Text..',
               // onChanged: ref.read(translatorProvider.notifier).setSourceText,
             ),
           ),

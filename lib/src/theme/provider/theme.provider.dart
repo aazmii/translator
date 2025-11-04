@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/db/isar.dart';
 import '../../core/utils/files/paths.dart';
-import '../../modules/setting/model/setting.model.dart';
+import '../../modules/setting/data/model/setting.model.dart';
 import '../../modules/setting/provider/settings.provider.dart';
 import '../model/theme.model.dart';
 
@@ -34,5 +34,5 @@ class _Data {
 
   final AppDir dir = appDir;
   final ThemeProfile theme;
-  final AppSetting setting;
+  final AppSettingIsar setting;
 }

@@ -4,14 +4,14 @@ import 'dart:convert' show json;
 
 import 'package:isar_community/isar.dart';
 
-import '../../../theme/model/theme.model.dart';
+import '../../../../theme/model/theme.model.dart';
 
 part 'setting.model.ext.dart';
 part 'setting.model.g.dart';
 
 @Collection()
-class AppSetting {
-  AppSetting();
+class AppSettingIsar {
+  AppSettingIsar();
 
   final Id id = 0;
 
@@ -28,10 +28,10 @@ class AppSetting {
         'id': id,
       };
 
-  factory AppSetting.fromJson(String source) =>
-      AppSetting.fromRawJson(json.decode(source));
+  factory AppSettingIsar.fromJson(String source) =>
+      AppSettingIsar.fromRawJson(json.decode(source));
 
-  factory AppSetting.fromRawJson(Map<String, dynamic> json) => AppSetting()
+  factory AppSettingIsar.fromRawJson(Map<String, dynamic> json) => AppSettingIsar()
     ..firstRun = json['firstRun'] as bool
     ..theme = ThemeProfile.values.firstWhere(
       (e) => e.name == json['theme'] as String,
@@ -44,7 +44,7 @@ class AppSetting {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is AppSetting && other.id == id;
+    return other is AppSettingIsar && other.id == id;
   }
 
   @Ignore()

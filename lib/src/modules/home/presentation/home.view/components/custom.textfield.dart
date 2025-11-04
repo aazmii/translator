@@ -9,7 +9,8 @@ class CustomTextField extends StatelessWidget {
     // this.onChanged,
     this.controller,
     this.autofocus = false,
-    this.focusNode
+    this.focusNode,
+    this.hintText,
   });
   // final String? initialValue;
   final bool? readOnly, showLoader;
@@ -17,6 +18,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final bool? autofocus;
   final FocusNode? focusNode;
+  final String? hintText;
   @override
   Widget build(BuildContext context) {
     return Scrollbar(
@@ -26,11 +28,8 @@ class CustomTextField extends StatelessWidget {
             focusNode: focusNode,
             controller: controller,
             autofocus: autofocus!,
-            // key: ValueKey(initialValue),
-            // initialValue: initialValue,
             expands: true,
             maxLines: null,
-            // onChanged: onChanged,
             textAlignVertical: TextAlignVertical.top,
             decoration: InputDecoration(
               contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),

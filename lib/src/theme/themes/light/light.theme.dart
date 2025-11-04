@@ -8,4 +8,5 @@ ThemeData get lightTheme => ThemeData(
       brightness: Brightness.light,
       useMaterial3: true,
       inputDecorationTheme: inputDecorationTheme,
+      textTheme: textTheme,
     );

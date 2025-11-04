@@ -7,4 +7,17 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<String?> translateText(OnDeviceTranslator translator, String text) {
     return translator.translateText(text);
   }
+  
+  @override
+  Future saveSourceLanguage(String code) {
+    // TODO: implement saveSourceLanguage
+    throw UnimplementedError();
+  }
+  
+  @override
+  Future saveTargetLanguage(String code) {
+    // TODO: implement saveTargetLanguage
+    throw UnimplementedError();
+  }
+  
 }
