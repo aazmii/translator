@@ -9,7 +9,5 @@ const inputDecorationTheme = InputDecorationTheme(
   filled: true,
 );
 const textTheme = TextTheme(
-  // bodySmall: TextStyle(fontSize: 28),
-  // bodyMedium: TextStyle(fontSize: 38),
-  bodyLarge: TextStyle(fontSize: 20),
+  bodyLarge: TextStyle(fontSize: 18),
 );
