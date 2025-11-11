@@ -24,7 +24,9 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   fadePush(context, OfflineLanguagesView(title: 'Translate From'));
                 },
                 child: Center(
-                  child: Text(source.name.capitalize),
+                  child: Text(
+                    source.name.capitalize,
+                  ),
                 ),
               ),
             ),
@@ -42,7 +44,9 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   fadePush(context, OfflineLanguagesView(title: 'Translate To'));
                 },
                 child: Center(
-                  child: Text(target.name.capitalize),
+                  child: Text(
+                    target.name.capitalize,
+                  ),
                 ),
               ),
             ),

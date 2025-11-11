@@ -8,3 +8,6 @@ const inputDecorationTheme = InputDecorationTheme(
   fillColor: Colors.transparent,
   filled: true,
 );
+const textTheme = TextTheme(
+  bodyLarge: TextStyle(fontSize: 18),
+);
