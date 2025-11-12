@@ -1,5 +1,7 @@
+import 'package:go_translator/src/core/di/providers.dart';
 import 'package:go_translator/src/modules/home/data/repository/translation.repo.impl.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:isar_community/isar.dart' show Isar;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'translator.g.dart';
@@ -13,9 +15,12 @@ part 'translator.g.dart';
 @Riverpod(keepAlive: true)
 class Translator extends _$Translator {
   late HomeRepositoryImpl _homeRepo;
+  late final Isar db;
+
   @override
   TranslaorModel build() {
-    _homeRepo = HomeRepositoryImpl();
+    db = ref.read(isarProvider); // inject dependency
+    _homeRepo = HomeRepositoryImpl(db);
     return TranslaorModel(
       sourceLanguage: TranslateLanguage.english,
       targetLanguage: TranslateLanguage.french,

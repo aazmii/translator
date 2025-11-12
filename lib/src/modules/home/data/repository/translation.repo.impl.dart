@@ -1,24 +1,26 @@
+import 'package:go_translator/src/modules/home/data/modles/translator.setting.dart';
+import 'package:go_translator/src/modules/home/domain/entities/translator.setting.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
+import 'package:isar_community/isar.dart' show Isar;
 
 import '../../domain/repository/home.repository.dart';
 
 class HomeRepositoryImpl implements HomeRepository {
+  final Isar db;
+  HomeRepositoryImpl(this.db);
   @override
   Future<String?> translateText(OnDeviceTranslator translator, String text) {
     return translator.translateText(text);
   }
-  
+
   @override
-  Future saveSourceLanguage(String code) {
-     
-    // TODO: implement saveSourceLanguage
-    throw UnimplementedError();
+  Future<TranslatorSettingEntity?> getTranslationSetting() async {
+    final tSetting = await db.translatorSettings.get(0);
+    return tSetting?.toDomain();
   }
-  
+
   @override
-  Future saveTargetLanguage(String code) {
-    // TODO: implement saveTargetLanguage
-    throw UnimplementedError();
+  Future saveTranslationSetting(TranslatorSettingEntity tSetting) async {
+    await db.translatorSettings.put(TranslatorSetting.fromDomain(tSetting));
   }
-  
 }

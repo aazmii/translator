@@ -1,16 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_translator/src/core/di/providers.dart';
 
-import '../../../core/db/isar.dart';
 import '../data/model/setting.model.dart';
 
-final _settingsStream = db.appSettings.watchObject(0, fireImmediately: true);
-final _settingsStreamProvider = StreamProvider((_) => _settingsStream);
+// Stream of app settings from Isar
+final settingsStreamProvider = StreamProvider<AppSetting?>((ref) {
+  final db = ref.watch(isarProvider);
+  return db.appSettings.watchObject(0, fireImmediately: true);
+});
 
-typedef AppSettingsNotifier = NotifierProvider<SettingProvider, AppSetting>;
-final settingsProvider = AppSettingsNotifier(SettingProvider.new);
+// AsyncNotifier for holding current settings
+final settingsProvider = AsyncNotifierProvider<SettingProvider, AppSetting>(SettingProvider.new);
 
-class SettingProvider extends Notifier<AppSetting> {
+class SettingProvider extends AsyncNotifier<AppSetting> {
   @override
-  AppSetting build() =>
-      ref.watch(_settingsStreamProvider).value ?? AppSetting();
+  Future<AppSetting> build() async {
+    // subscribe to stream changes
+    final stream = ref.watch(settingsStreamProvider);
+
+    return stream.when(
+      data: (data) => data ?? AppSetting(),
+      loading: () => AppSetting(), // fallback initial value
+      error: (_, __) => AppSetting(),
+    );
+  }
 }
