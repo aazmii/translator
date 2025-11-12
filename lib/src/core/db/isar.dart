@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart' show kReleaseMode;
+import 'package:go_translator/src/modules/home/data/modles/translator.setting.dart';
 import 'package:isar_community/isar.dart' show Isar;
 import '../../modules/setting/data/model/setting.model.dart' show AppSettingSchema;
 import '../utils/files/paths.dart' show AppDir, appDir, initDir;
 
-const _schema = [AppSettingSchema];
+const _schema = [AppSettingSchema, TranslatorSettingSchema];
 late final Isar db;
 
 Future<void> openDB() async {

@@ -34,5 +34,5 @@ class _Data {
 
   final AppDir dir = appDir;
   final ThemeProfile theme;
-  final AppSettingIsar setting;
+  final AppSetting setting;
 }

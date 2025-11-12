@@ -41,7 +41,7 @@ final class TranslatorProvider
   }
 }
 
-String _$translatorHash() => r'6fb30793f449c7cb23ad37a3e4f8c4ea7739650f';
+String _$translatorHash() => r'f1cc2f8ebf2f665c68c29163d08f9ecf58994be6';
 
 abstract class _$Translator extends $Notifier<TranslaorModel> {
   TranslaorModel build();

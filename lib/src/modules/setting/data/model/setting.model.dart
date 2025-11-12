@@ -10,8 +10,8 @@ part 'setting.model.ext.dart';
 part 'setting.model.g.dart';
 
 @Collection()
-class AppSettingIsar {
-  AppSettingIsar();
+class AppSetting {
+  AppSetting();
 
   final Id id = 0;
 
@@ -28,10 +28,10 @@ class AppSettingIsar {
         'id': id,
       };
 
-  factory AppSettingIsar.fromJson(String source) =>
-      AppSettingIsar.fromRawJson(json.decode(source));
+  factory AppSetting.fromJson(String source) =>
+      AppSetting.fromRawJson(json.decode(source));
 
-  factory AppSettingIsar.fromRawJson(Map<String, dynamic> json) => AppSettingIsar()
+  factory AppSetting.fromRawJson(Map<String, dynamic> json) => AppSetting()
     ..firstRun = json['firstRun'] as bool
     ..theme = ThemeProfile.values.firstWhere(
       (e) => e.name == json['theme'] as String,
@@ -44,7 +44,7 @@ class AppSettingIsar {
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
-    return other is AppSettingIsar && other.id == id;
+    return other is AppSetting && other.id == id;
   }
 
   @Ignore()
