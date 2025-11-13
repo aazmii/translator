@@ -1,16 +1,11 @@
 import 'package:go_translator/src/core/di/providers.dart';
 import 'package:go_translator/src/modules/home/data/repository/translation.repo.impl.dart';
+import 'package:go_translator/src/modules/home/domain/entities/translation.model.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 import 'package:isar_community/isar.dart' show Isar;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'translator.g.dart';
-// final userProvider = FutureProvider<User>((ref) async {
-//   final response = await http.get('https://api.example.com/user/123');
-//   return User.fromJson(response.body);
-// });
-
-// final sourceLanguageProvider = Provider((ref) => TranslateLanguage.english);
 
 @Riverpod(keepAlive: true)
 class Translator extends _$Translator {
@@ -21,6 +16,7 @@ class Translator extends _$Translator {
   TranslaorModel build() {
     db = ref.read(isarProvider); // inject dependency
     _homeRepo = HomeRepositoryImpl(db);
+
     return TranslaorModel(
       sourceLanguage: TranslateLanguage.english,
       targetLanguage: TranslateLanguage.french,
@@ -60,31 +56,4 @@ class Translator extends _$Translator {
 
     state = state.copyWith(targetLanguage: targetLanguage);
   }
-}
-
-class TranslaorModel {
-  final TranslateLanguage sourceLanguage, targetLanguage;
-
-  final String? sourceText, translatedText;
-
-  final OnDeviceTranslator translator;
-  TranslaorModel({
-    required this.sourceLanguage,
-    required this.targetLanguage,
-    this.sourceText,
-    this.translatedText,
-  }) : translator = OnDeviceTranslator(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
-  static const _noValue = Object();
-  TranslaorModel copyWith({
-    TranslateLanguage? sourceLanguage,
-    TranslateLanguage? targetLanguage,
-    Object? sourceText = _noValue,
-    Object? translatedText = _noValue,
-  }) =>
-      TranslaorModel(
-        sourceLanguage: sourceLanguage ?? this.sourceLanguage,
-        targetLanguage: targetLanguage ?? this.targetLanguage,
-        sourceText: sourceText == _noValue ? this.sourceText : sourceText as String?,
-        translatedText: translatedText == _noValue ? this.translatedText : translatedText as String?,
-      );
 }
