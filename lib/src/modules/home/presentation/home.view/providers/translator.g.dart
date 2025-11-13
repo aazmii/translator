@@ -13,7 +13,7 @@ part of 'translator.dart';
 const translatorProvider = TranslatorProvider._();
 
 final class TranslatorProvider
-    extends $NotifierProvider<Translator, TranslaorModel> {
+    extends $AsyncNotifierProvider<Translator, TranslationSettingEntity?> {
   const TranslatorProvider._()
       : super(
           from: null,
@@ -31,28 +31,22 @@ final class TranslatorProvider
   @$internal
   @override
   Translator create() => Translator();
-
-  /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(TranslaorModel value) {
-    return $ProviderOverride(
-      origin: this,
-      providerOverride: $SyncValueProvider<TranslaorModel>(value),
-    );
-  }
 }
 
-String _$translatorHash() => r'6fb30793f449c7cb23ad37a3e4f8c4ea7739650f';
+String _$translatorHash() => r'0dcca3a7fed81c1ff1b2b3c1c17443013831d4d8';
 
-abstract class _$Translator extends $Notifier<TranslaorModel> {
-  TranslaorModel build();
+abstract class _$Translator extends $AsyncNotifier<TranslationSettingEntity?> {
+  FutureOr<TranslationSettingEntity?> build();
   @$mustCallSuper
   @override
   void runBuild() {
     final created = build();
-    final ref = this.ref as $Ref<TranslaorModel, TranslaorModel>;
+    final ref = this.ref as $Ref<AsyncValue<TranslationSettingEntity?>,
+        TranslationSettingEntity?>;
     final element = ref.element as $ClassProviderElement<
-        AnyNotifier<TranslaorModel, TranslaorModel>,
-        TranslaorModel,
+        AnyNotifier<AsyncValue<TranslationSettingEntity?>,
+            TranslationSettingEntity?>,
+        AsyncValue<TranslationSettingEntity?>,
         Object?,
         Object?>;
     element.handleValue(ref, created);

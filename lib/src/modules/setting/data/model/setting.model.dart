@@ -4,7 +4,7 @@ import 'dart:convert' show json;
 
 import 'package:isar_community/isar.dart';
 
-import '../../../theme/model/theme.model.dart';
+import '../../../../theme/model/theme.model.dart';
 
 part 'setting.model.ext.dart';
 part 'setting.model.g.dart';

@@ -33,7 +33,7 @@ final class OfflineLanguagesProvider
   OfflineLanguages create() => OfflineLanguages();
 }
 
-String _$offlineLanguagesHash() => r'859b2e9c938d9cf111a56d3186e93f9ae4116bd1';
+String _$offlineLanguagesHash() => r'10bb93a241207477e18fb9f2301c71b6b5d06f78';
 
 abstract class _$OfflineLanguages extends $AsyncNotifier<List<LanguageEntity>> {
   FutureOr<List<LanguageEntity>> build();

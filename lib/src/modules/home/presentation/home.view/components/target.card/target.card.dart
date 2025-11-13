@@ -27,7 +27,7 @@ class _TargetCardState extends ConsumerState<TargetCard> {
 
   @override
   Widget build(BuildContext context) {
-    targetController.text = ref.watch(translatorProvider).translatedText ?? '';
+    targetController.text = ref.watch(translatorProvider).value?.translatedText ?? '';
     return Card(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
