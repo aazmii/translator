@@ -1,3 +1,5 @@
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' show WidgetsFlutterBinding, runApp;
 import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 
@@ -11,7 +13,12 @@ import 'src/core/db/isar.dart' show IsarDb;
 void main() async {
   final isar = await _init();
 
-  runApp(ProviderScope(overrides: [isarProvider.overrideWithValue(isar)], child: const MyApp()));
+  runApp(
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) => ProviderScope(overrides: [isarProvider.overrideWithValue(isar)], child: const MyApp()),
+    ),
+  );
 }
 
 Future<Isar> _init() async {

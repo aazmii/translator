@@ -9,51 +9,64 @@ part 'translator.g.dart';
 
 @Riverpod(keepAlive: true)
 class Translator extends _$Translator {
-  late HomeRepositoryImpl _homeRepo;
+  late TranslationRepositoryImpl _translatorRepo;
   late final Isar db;
-
   @override
-  TranslationSettingEntity build() {
-    db = ref.read(isarProvider); // inject dependency
-    _homeRepo = HomeRepositoryImpl(db);
+  Future<TranslationSettingEntity?> build() async {
+    db = ref.read(isarProvider);
+    _translatorRepo = TranslationRepositoryImpl(db);
 
-    return TranslationSettingEntity(
-      sourceLanguage: TranslateLanguage.english,
-      targetLanguage: TranslateLanguage.french,
-    );
+    // try to fetch saved settings
+    final saved = await _translatorRepo.getTranslationSetting();
+
+    // if no record exists, create default and persist it
+    if (saved == null) {
+      final defaultSetting = TranslationSettingEntity(
+        sourceLanguage: TranslateLanguage.english,
+        targetLanguage: TranslateLanguage.french,
+      );
+      await _translatorRepo.saveTranslationSetting(defaultSetting);
+      return defaultSetting;
+    }
+
+    return saved;
   }
 
+  TranslationSettingEntity? get value => state.value;
   Future<void> swapLanguage() async {
-    state = state.copyWith(
-      sourceLanguage: state.targetLanguage,
-      targetLanguage: state.sourceLanguage,
-    );
-  }
-
-  void clear() {
-    state = state.copyWith(sourceText: null, translatedText: null);
+    state = AsyncData(value?.copyWith(
+      sourceLanguage: value?.targetLanguage,
+      targetLanguage: value?.sourceLanguage,
+    ));
+    await _translatorRepo.saveTranslationSetting(value!);
   }
 
   void setSourceText(String? s) {
-    state = state.copyWith(sourceText: s);
+    state = AsyncData(value?.copyWith(sourceText: s));
   }
 
   Future<void> translate() async {
-    if (state.sourceText == null || state.sourceText!.isEmpty) return;
-    final translatedText = await _homeRepo.translateText(state.translator, state.sourceText!);
-    state = state.copyWith(translatedText: translatedText);
+    if (value?.sourceText == null || value!.sourceText!.isEmpty) return;
+    final translatedText = await _translatorRepo.translateText(value!.translator, value!.sourceText!);
+    state = AsyncData(value?.copyWith(translatedText: translatedText));
   }
 
   set setSourceLanguage(String code) {
-    if (code == state.targetLanguage.bcpCode) swapLanguage();
+    if (code == value?.targetLanguage.bcpCode) swapLanguage();
     final sourceLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
-    state = state.copyWith(sourceLanguage: sourceLanguage);
+    state = AsyncData(value?.copyWith(sourceLanguage: sourceLanguage));
+    _translatorRepo.saveTranslationSetting(value!);
   }
 
   set setTargetLanguage(String code) {
-    if (code == state.targetLanguage.bcpCode) swapLanguage();
+    if (code == value?.targetLanguage.bcpCode) swapLanguage();
     final targetLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
 
-    state = state.copyWith(targetLanguage: targetLanguage);
+    state = AsyncData(value?.copyWith(targetLanguage: targetLanguage));
+    _translatorRepo.saveTranslationSetting(value!);
+  }
+
+  void clear() {
+    state = AsyncData(value?.copyWith(sourceText: null, translatedText: null));
   }
 }

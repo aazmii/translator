@@ -24,7 +24,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final sourceText = ref.watch(translatorProvider).sourceText;
+    final sourceText = ref.watch(translatorProvider).value?.sourceText;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,

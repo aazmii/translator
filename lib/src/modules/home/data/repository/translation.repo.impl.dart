@@ -5,9 +5,9 @@ import 'package:isar_community/isar.dart' show Isar;
 
 import '../../domain/repository/home.repository.dart';
 
-class HomeRepositoryImpl implements HomeRepository {
+class TranslationRepositoryImpl implements TranslationRpository {
   final Isar db;
-  HomeRepositoryImpl(this.db);
+  TranslationRepositoryImpl(this.db);
   @override
   Future<String?> translateText(OnDeviceTranslator translator, String text) {
     return translator.translateText(text);
@@ -21,6 +21,8 @@ class HomeRepositoryImpl implements HomeRepository {
 
   @override
   Future saveTranslationSetting(TranslationSettingEntity tSetting) async {
-    await db.translatorSettings.put(TranslatorSetting.fromDomain(tSetting));
+    await db.writeTxn(() async {
+      await db.translatorSettings.put(TranslatorSetting.fromDomain(tSetting));
+    });
   }
 }

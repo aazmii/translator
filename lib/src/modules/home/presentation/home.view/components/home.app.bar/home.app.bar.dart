@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/config/router/provider/route.provider.dart';
+import 'package:go_translator/src/core/extensions/extensions.dart';
 import 'package:go_translator/src/modules/languages/presentation/view/offline.languages.view.dart';
 
 import '../../providers/translator.dart';
@@ -10,8 +11,8 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    final source = ref.watch(translatorProvider).sourceLanguage;
-    final target = ref.watch(translatorProvider).targetLanguage;
+    final source = ref.watch(translatorProvider).value?.sourceLanguage;
+    final target = ref.watch(translatorProvider).value?.targetLanguage;
     return AppBar(
       title: ListTile(
         title: Row(
@@ -23,7 +24,7 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   fadePush(context, OfflineLanguagesView(title: 'Translate From'));
                 },
                 child: Center(
-                  child: Text(source.name.capitalize),
+                  child: Text(source?.name.capitalize ?? ''),
                 ),
               ),
             ),
@@ -41,7 +42,7 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
                   fadePush(context, OfflineLanguagesView(title: 'Translate To'));
                 },
                 child: Center(
-                  child: Text(target.name.capitalize),
+                  child: Text(target?.name.capitalize ?? ''),
                 ),
               ),
             ),

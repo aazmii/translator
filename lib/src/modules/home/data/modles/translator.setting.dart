@@ -6,16 +6,19 @@ part 'translator.setting.g.dart';
 
 @Collection()
 class TranslatorSetting {
-  String? sourceLangCode;
-  String? targetLangCode;
+  String? sourceLang;
+  String? targetLang;
+  String? json;
+  Id id = 0;
+
   TranslatorSetting();
-  final Id id = 0;
 
   TranslationSettingEntity toDomain() => TranslationSettingEntity(
-        sourceLanguage: TranslateLanguage.values.firstWhere((e) => e.name == sourceLangCode),
-        targetLanguage: TranslateLanguage.values.firstWhere((e) => e.name == targetLangCode),
+        sourceLanguage: TranslateLanguage.values.firstWhere((e) => e.name == sourceLang),
+        targetLanguage: TranslateLanguage.values.firstWhere((e) => e.name == targetLang),
       );
   static TranslatorSetting fromDomain(TranslationSettingEntity tSetting) => TranslatorSetting()
-    ..sourceLangCode = tSetting.sourceLanguage.name
-    ..targetLangCode = tSetting.targetLanguage.name;
+    ..id = 0
+    ..sourceLang = tSetting.sourceLanguage.name
+    ..targetLang = tSetting.targetLanguage.name;
 }

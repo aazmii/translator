@@ -22,7 +22,7 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
 
   @override
   Widget build(BuildContext context) {
-    final targetText = ref.watch(translatorProvider).translatedText;
+    final targetText = ref.watch(translatorProvider).value?.translatedText;
     if (targetText == null || targetText.isEmpty) return const SizedBox.shrink();
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
