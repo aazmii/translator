@@ -13,11 +13,11 @@ class Translator extends _$Translator {
   late final Isar db;
 
   @override
-  TranslaorModel build() {
+  TranslationSettingEntity build() {
     db = ref.read(isarProvider); // inject dependency
     _homeRepo = HomeRepositoryImpl(db);
 
-    return TranslaorModel(
+    return TranslationSettingEntity(
       sourceLanguage: TranslateLanguage.english,
       targetLanguage: TranslateLanguage.french,
     );

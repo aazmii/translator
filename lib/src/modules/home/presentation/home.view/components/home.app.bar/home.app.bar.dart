@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/config/router/provider/route.provider.dart';
-import 'package:go_translator/src/core/extensions/extensions.dart';
 import 'package:go_translator/src/modules/languages/presentation/view/offline.languages.view.dart';
 
 import '../../providers/translator.dart';
