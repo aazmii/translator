@@ -46,7 +46,7 @@ class _ExpandableSearchBoxState extends State<ExpandableSearchBox> with SingleTi
       // padding: const EdgeInsets.symmetric(horizontal: 8),
 
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: .end,
         children: [
           if (_isExpanded)
             Expanded(

@@ -25,8 +25,8 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
     final targetText = ref.watch(translatorProvider).value?.translatedText;
     if (targetText == null || targetText.isEmpty) return const SizedBox.shrink();
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: .spaceBetween,
+      mainAxisSize: .min,
       children: [
         IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: targetText))),
         IconButton(

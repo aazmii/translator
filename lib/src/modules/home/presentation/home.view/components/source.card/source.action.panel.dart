@@ -27,7 +27,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
     final sourceText = ref.watch(translatorProvider).value?.sourceText;
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: .spaceBetween,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (sourceText != null && sourceText.isNotEmpty) ...[

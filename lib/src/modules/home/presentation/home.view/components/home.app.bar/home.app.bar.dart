@@ -16,16 +16,14 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
     return AppBar(
       title: ListTile(
         title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: .spaceAround,
           children: [
             Expanded(
               child: InkWell(
                 onTap: () {
                   fadePush(context, OfflineLanguagesView(title: 'Translate From'));
                 },
-                child: Center(
-                  child: Text(source?.name.capitalize ?? ''),
-                ),
+                child: Center(child: Text(source?.name.capitalize ?? '')),
               ),
             ),
             IconButton(
@@ -41,9 +39,7 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
                 onTap: () {
                   fadePush(context, OfflineLanguagesView(title: 'Translate To'));
                 },
-                child: Center(
-                  child: Text(target?.name.capitalize ?? ''),
-                ),
+                child: Center(child: Text(target?.name.capitalize ?? '')),
               ),
             ),
           ],
