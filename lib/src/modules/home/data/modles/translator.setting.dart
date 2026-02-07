@@ -14,11 +14,25 @@ class TranslatorSetting {
   TranslatorSetting();
 
   TranslationSettingEntity toDomain() => TranslationSettingEntity(
-        sourceLanguage: TranslateLanguage.values.firstWhere((e) => e.name == sourceLang),
-        targetLanguage: TranslateLanguage.values.firstWhere((e) => e.name == targetLang),
+        sourceLanguageCode: _toBcpCode(sourceLang, fallback: TranslateLanguage.english),
+        targetLanguageCode: _toBcpCode(targetLang, fallback: TranslateLanguage.french),
       );
   static TranslatorSetting fromDomain(TranslationSettingEntity tSetting) => TranslatorSetting()
     ..id = 0
-    ..sourceLang = tSetting.sourceLanguage.name
-    ..targetLang = tSetting.targetLanguage.name;
+    ..sourceLang = tSetting.sourceLanguageCode
+    ..targetLang = tSetting.targetLanguageCode;
+}
+
+String _toBcpCode(String? value, {required TranslateLanguage fallback}) {
+  if (value == null || value.isEmpty) return fallback.bcpCode;
+  final byCode = TranslateLanguage.values.firstWhere(
+    (e) => e.bcpCode == value,
+    orElse: () => fallback,
+  );
+  if (byCode.bcpCode == value) return byCode.bcpCode;
+  final byName = TranslateLanguage.values.firstWhere(
+    (e) => e.name == value,
+    orElse: () => fallback,
+  );
+  return byName.bcpCode;
 }

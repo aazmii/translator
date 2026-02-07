@@ -1,4 +1,4 @@
-import 'package:go_translator/src/theme/model/theme.model.dart';
+import 'package:go_translator/src/core/domain/entities/theme.profile.dart';
 
 class AppSetting {
   AppSetting({

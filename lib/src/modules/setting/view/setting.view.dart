@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../theme/model/theme.model.dart';
+import '../../../core/domain/entities/theme.profile.dart';
 import '../../../theme/provider/theme.provider.dart';
 
 class SettingView extends StatelessWidget {

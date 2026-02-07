@@ -1,27 +1,25 @@
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-
 class TranslationSettingEntity {
-  final TranslateLanguage sourceLanguage, targetLanguage;
+  final String sourceLanguageCode;
+  final String targetLanguageCode;
 
-  final String? sourceText, translatedText;
-
-  final OnDeviceTranslator translator;
+  final String? sourceText;
+  final String? translatedText;
   TranslationSettingEntity({
-    required this.sourceLanguage,
-    required this.targetLanguage,
+    required this.sourceLanguageCode,
+    required this.targetLanguageCode,
     this.sourceText,
     this.translatedText,
-  }) : translator = OnDeviceTranslator(sourceLanguage: sourceLanguage, targetLanguage: targetLanguage);
+  });
   static const _noValue = Object();
   TranslationSettingEntity copyWith({
-    TranslateLanguage? sourceLanguage,
-    TranslateLanguage? targetLanguage,
+    String? sourceLanguageCode,
+    String? targetLanguageCode,
     Object? sourceText = _noValue,
     Object? translatedText = _noValue,
   }) =>
       TranslationSettingEntity(
-        sourceLanguage: sourceLanguage ?? this.sourceLanguage,
-        targetLanguage: targetLanguage ?? this.targetLanguage,
+        sourceLanguageCode: sourceLanguageCode ?? this.sourceLanguageCode,
+        targetLanguageCode: targetLanguageCode ?? this.targetLanguageCode,
         sourceText: sourceText == _noValue ? this.sourceText : sourceText as String?,
         translatedText: translatedText == _noValue ? this.translatedText : translatedText as String?,
       );

@@ -9,6 +9,8 @@ import 'package:isar_community/isar.dart' show Isar;
 
 import 'src/app.dart' show MyApp;
 import 'src/core/db/isar.dart' show IsarDb;
+import 'src/modules/home/data/modles/translator.setting.dart' show TranslatorSettingSchema;
+import 'src/modules/setting/data/model/setting.model.dart' show AppSettingSchema;
 
 void main() async {
   final isar = await _init();
@@ -24,7 +26,7 @@ void main() async {
 Future<Isar> _init() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  final isar = await IsarDb.initialize();
+  final isar = await IsarDb.initialize([AppSettingSchema, TranslatorSettingSchema]);
   return isar;
 }
 

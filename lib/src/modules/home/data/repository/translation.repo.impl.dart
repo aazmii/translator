@@ -9,8 +9,20 @@ class TranslationRepositoryImpl implements TranslationRpository {
   final Isar db;
   TranslationRepositoryImpl(this.db);
   @override
-  Future<String?> translateText(OnDeviceTranslator translator, String text) {
-    return translator.translateText(text);
+  Future<String?> translateText({
+    required String sourceLanguageCode,
+    required String targetLanguageCode,
+    required String text,
+  }) async {
+    final translator = OnDeviceTranslator(
+      sourceLanguage: _languageFromCode(sourceLanguageCode),
+      targetLanguage: _languageFromCode(targetLanguageCode),
+    );
+    try {
+      return await translator.translateText(text);
+    } finally {
+      translator.close();
+    }
   }
 
   @override
@@ -26,3 +38,8 @@ class TranslationRepositoryImpl implements TranslationRpository {
     });
   }
 }
+
+TranslateLanguage _languageFromCode(String code) => TranslateLanguage.values.firstWhere(
+      (e) => e.bcpCode == code,
+      orElse: () => TranslateLanguage.english,
+    );
