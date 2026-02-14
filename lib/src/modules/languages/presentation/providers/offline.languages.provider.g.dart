@@ -10,20 +10,20 @@ part of 'offline.languages.provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(OfflineLanguages)
-const offlineLanguagesProvider = OfflineLanguagesProvider._();
+final offlineLanguagesProvider = OfflineLanguagesProvider._();
 
 final class OfflineLanguagesProvider
     extends $AsyncNotifierProvider<OfflineLanguages, List<LanguageEntity>> {
-  const OfflineLanguagesProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'offlineLanguagesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  OfflineLanguagesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'offlineLanguagesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$offlineLanguagesHash();
@@ -33,21 +33,27 @@ final class OfflineLanguagesProvider
   OfflineLanguages create() => OfflineLanguages();
 }
 
-String _$offlineLanguagesHash() => r'10bb93a241207477e18fb9f2301c71b6b5d06f78';
+String _$offlineLanguagesHash() => r'68e84bf9f9bca6092332e7911641c9342abe3a3d';
 
 abstract class _$OfflineLanguages extends $AsyncNotifier<List<LanguageEntity>> {
   FutureOr<List<LanguageEntity>> build();
   @$mustCallSuper
   @override
   void runBuild() {
-    final created = build();
-    final ref = this.ref
-        as $Ref<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>,
-        AsyncValue<List<LanguageEntity>>,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<LanguageEntity>>,
+                List<LanguageEntity>
+              >,
+              AsyncValue<List<LanguageEntity>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
   }
 }

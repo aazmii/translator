@@ -28,7 +28,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
 
     return Column(
       mainAxisAlignment: .spaceBetween,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         if (sourceText != null && sourceText.isNotEmpty) ...[
           IconButton(

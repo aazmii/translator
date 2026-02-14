@@ -45,8 +45,8 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
             final language = languages[i];
             if (i == 0) {
               return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: .min,
+                crossAxisAlignment: .start,
                 children: [
                   Text('Recent Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
                   ListTile(
@@ -68,8 +68,8 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
             }
             if (i == downloaded!.length) {
               return Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: .min,
+                crossAxisAlignment: .start,
                 children: [
                   Text('Other Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
                   ListTile(

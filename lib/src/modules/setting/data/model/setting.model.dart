@@ -1,23 +1,16 @@
 import 'dart:convert' show json;
 
- 
-
-import 'package:isar_community/isar.dart';
-
 import '../../../../core/domain/entities/theme.profile.dart';
 
 part 'setting.model.ext.dart';
-part 'setting.model.g.dart';
 
-@Collection()
 class AppSetting {
   AppSetting();
 
-  final Id id = 0;
+  final int id = 0;
 
   bool firstRun = true;
 
-  @Enumerated(EnumType.name)
   ThemeProfile theme = ThemeProfile.dark;
 
   String toRawJson() => json.encode(toJson());
@@ -47,7 +40,6 @@ class AppSetting {
     return other is AppSetting && other.id == id;
   }
 
-  @Ignore()
   @override
   int get hashCode => id.hashCode;
 }
