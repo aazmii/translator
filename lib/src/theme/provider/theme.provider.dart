@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/domain/entities/theme.profile.dart';
 import '../../core/utils/files/paths.dart';
 import '../../modules/setting/data/model/setting.model.dart';
 import '../../modules/setting/provider/settings.provider.dart';
@@ -22,9 +23,7 @@ class ThemeProvider extends Notifier<ThemeProfile> {
 }
 
 void _changeTheme(_Data data) {
-  // openDBSync(data.dir);
   data.setting.theme = data.theme;
-  // db.writeTxnSync(() => db.appSettings.putSync(data.setting));
 }
 
 class _Data {

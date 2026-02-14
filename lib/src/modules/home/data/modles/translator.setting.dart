@@ -1,24 +1,47 @@
+import 'dart:convert' show json;
+
 import 'package:go_translator/src/modules/home/domain/entities/translation.model.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:isar_community/isar.dart';
 
-part 'translator.setting.g.dart';
-
-@Collection()
 class TranslatorSetting {
   String? sourceLang;
   String? targetLang;
-  String? json;
-  Id id = 0;
 
   TranslatorSetting();
 
+  String toRawJson() => json.encode(toJson());
+
+  Map<String, dynamic> toJson() => {
+        'sourceLang': sourceLang,
+        'targetLang': targetLang,
+      };
+
+  factory TranslatorSetting.fromJson(String source) =>
+      TranslatorSetting.fromRawJson(json.decode(source) as Map<String, dynamic>);
+
+  factory TranslatorSetting.fromRawJson(Map<String, dynamic> raw) => TranslatorSetting()
+    ..sourceLang = raw['sourceLang'] as String?
+    ..targetLang = raw['targetLang'] as String?;
+
   TranslationSettingEntity toDomain() => TranslationSettingEntity(
-        sourceLanguage: TranslateLanguage.values.firstWhere((e) => e.name == sourceLang),
-        targetLanguage: TranslateLanguage.values.firstWhere((e) => e.name == targetLang),
+        sourceLanguageCode: _toBcpCode(sourceLang, fallback: TranslateLanguage.english),
+        targetLanguageCode: _toBcpCode(targetLang, fallback: TranslateLanguage.french),
       );
   static TranslatorSetting fromDomain(TranslationSettingEntity tSetting) => TranslatorSetting()
-    ..id = 0
-    ..sourceLang = tSetting.sourceLanguage.name
-    ..targetLang = tSetting.targetLanguage.name;
+    ..sourceLang = tSetting.sourceLanguageCode
+    ..targetLang = tSetting.targetLanguageCode;
+}
+
+String _toBcpCode(String? value, {required TranslateLanguage fallback}) {
+  if (value == null || value.isEmpty) return fallback.bcpCode;
+  final byCode = TranslateLanguage.values.firstWhere(
+    (e) => e.bcpCode == value,
+    orElse: () => fallback,
+  );
+  if (byCode.bcpCode == value) return byCode.bcpCode;
+  final byName = TranslateLanguage.values.firstWhere(
+    (e) => e.name == value,
+    orElse: () => fallback,
+  );
+  return byName.bcpCode;
 }

@@ -30,7 +30,7 @@ class _TargetCardState extends ConsumerState<TargetCard> {
     targetController.text = ref.watch(translatorProvider).value?.translatedText ?? '';
     return Card(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Expanded(
             child: CustomTextField(

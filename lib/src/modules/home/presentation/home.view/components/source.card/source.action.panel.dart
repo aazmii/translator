@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
+import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 
 import '../../providers/translator.dart';
 
@@ -15,20 +16,16 @@ class SourceActionPanel extends ConsumerStatefulWidget {
 
 class _ActionPanelState extends ConsumerState<SourceActionPanel> {
   final _flutterTts = FlutterTts();
-  Map<String, String>? voice;
-  @override
-  void initState() {
-    super.initState();
-    _initTTS();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final sourceText = ref.watch(translatorProvider).value?.sourceText;
+    final translation = ref.watch(translatorProvider).value;
+    final sourceText = translation?.sourceText;
+    final sourceLanguageCode = translation?.sourceLanguageCode ?? 'en';
 
     return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: .spaceBetween,
+      mainAxisSize: .min,
       children: [
         if (sourceText != null && sourceText.isNotEmpty) ...[
           IconButton(
@@ -41,7 +38,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
           ),
           IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: sourceText))),
           IconButton(
-            onPressed: () async => await _flutterTts.speak(sourceText),
+            onPressed: () async => _speak(text: sourceText, languageCode: sourceLanguageCode),
             icon: Icon(Icons.speaker),
           ),
           IconButton(icon: Icon(Icons.bookmark), onPressed: null),
@@ -78,24 +75,8 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
     );
   }
 
-  void _initTTS() async {
-    var voices = await _flutterTts.getVoices;
-
-    var defaultVoiceRaw = await _flutterTts.getDefaultVoice;
-
-    Map<String, String> defaultVoice = Map<String, String>.from(defaultVoiceRaw);
-
-    if (voices.any((v) => v['name'] == defaultVoice['name'])) {
-      await _flutterTts.setVoice({
-        'name': defaultVoice['name']!,
-        'locale': defaultVoice['locale']!,
-      });
-    } else {
-      await _flutterTts.setLanguage('en-US');
-    }
-
-    setState(() {
-      voice = defaultVoice;
-    });
+  Future<void> _speak({required String text, required String languageCode}) async {
+    await setTtsLanguage(_flutterTts, languageCode);
+    await _flutterTts.speak(text);
   }
 }

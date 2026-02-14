@@ -1,20 +1,17 @@
 import 'package:go_translator/src/core/di/providers.dart';
-import 'package:go_translator/src/modules/home/data/repository/translation.repo.impl.dart';
 import 'package:go_translator/src/modules/home/domain/entities/translation.model.dart';
 import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:isar_community/isar.dart' show Isar;
+import 'package:go_translator/src/modules/home/domain/repository/home.repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'translator.g.dart';
 
 @Riverpod(keepAlive: true)
 class Translator extends _$Translator {
-  late TranslationRepositoryImpl _translatorRepo;
-  late final Isar db;
+  late TranslationRpository _translatorRepo;
   @override
   Future<TranslationSettingEntity?> build() async {
-    db = ref.read(isarProvider);
-    _translatorRepo = TranslationRepositoryImpl(db);
+    _translatorRepo = ref.read(translationRepositoryProvider);
 
     // try to fetch saved settings
     final saved = await _translatorRepo.getTranslationSetting();
@@ -22,8 +19,8 @@ class Translator extends _$Translator {
     // if no record exists, create default and persist it
     if (saved == null) {
       final defaultSetting = TranslationSettingEntity(
-        sourceLanguage: TranslateLanguage.english,
-        targetLanguage: TranslateLanguage.french,
+        sourceLanguageCode: TranslateLanguage.english.bcpCode,
+        targetLanguageCode: TranslateLanguage.french.bcpCode,
       );
       await _translatorRepo.saveTranslationSetting(defaultSetting);
       return defaultSetting;
@@ -35,8 +32,8 @@ class Translator extends _$Translator {
   TranslationSettingEntity? get value => state.value;
   Future<void> swapLanguage() async {
     state = AsyncData(value?.copyWith(
-      sourceLanguage: value?.targetLanguage,
-      targetLanguage: value?.sourceLanguage,
+      sourceLanguageCode: value?.targetLanguageCode,
+      targetLanguageCode: value?.sourceLanguageCode,
     ));
     await _translatorRepo.saveTranslationSetting(value!);
   }
@@ -47,22 +44,23 @@ class Translator extends _$Translator {
 
   Future<void> translate() async {
     if (value?.sourceText == null || value!.sourceText!.isEmpty) return;
-    final translatedText = await _translatorRepo.translateText(value!.translator, value!.sourceText!);
+    final translatedText = await _translatorRepo.translateText(
+      sourceLanguageCode: value!.sourceLanguageCode,
+      targetLanguageCode: value!.targetLanguageCode,
+      text: value!.sourceText!,
+    );
     state = AsyncData(value?.copyWith(translatedText: translatedText));
   }
 
   set setSourceLanguage(String code) {
-    if (code == value?.targetLanguage.bcpCode) swapLanguage();
-    final sourceLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
-    state = AsyncData(value?.copyWith(sourceLanguage: sourceLanguage));
+    if (code == value?.targetLanguageCode) swapLanguage();
+    state = AsyncData(value?.copyWith(sourceLanguageCode: code));
     _translatorRepo.saveTranslationSetting(value!);
   }
 
   set setTargetLanguage(String code) {
-    if (code == value?.targetLanguage.bcpCode) swapLanguage();
-    final targetLanguage = TranslateLanguage.values.firstWhere((e) => e.bcpCode == code);
-
-    state = AsyncData(value?.copyWith(targetLanguage: targetLanguage));
+    if (code == value?.targetLanguageCode) swapLanguage();
+    state = AsyncData(value?.copyWith(targetLanguageCode: code));
     _translatorRepo.saveTranslationSetting(value!);
   }
 
