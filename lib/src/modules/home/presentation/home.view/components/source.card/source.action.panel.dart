@@ -36,10 +36,13 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             },
             icon: Icon(Icons.close),
           ),
-          IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: sourceText))),
+          IconButton(
+            icon: Icon(Icons.paste),
+            onPressed: () => Clipboard.setData(ClipboardData(text: sourceText)),
+          ),
           IconButton(
             onPressed: () async => _speak(text: sourceText, languageCode: sourceLanguageCode),
-            icon: Icon(Icons.speaker),
+            icon: Icon(Icons.volume_up),
           ),
           IconButton(icon: Icon(Icons.bookmark), onPressed: null),
           Spacer(),
@@ -66,15 +69,13 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             },
             icon: Icon(Icons.paste),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.mic),
-          ),
-        ]
+          IconButton(onPressed: () {}, icon: Icon(Icons.mic)),
+        ],
       ],
     );
   }
 
+  /// it should open speech to text instead
   Future<void> _speak({required String text, required String languageCode}) async {
     await setTtsLanguage(_flutterTts, languageCode);
     await _flutterTts.speak(text);
