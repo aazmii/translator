@@ -32,12 +32,7 @@ class _TargetCardState extends ConsumerState<TargetCard> {
       child: Row(
         crossAxisAlignment: .start,
         children: [
-          Expanded(
-            child: CustomTextField(
-              controller: targetController,
-              readOnly: true,
-            ),
-          ),
+          Expanded(child: CustomTextField(controller: targetController, readOnly: true)),
           TargetActionPanel(),
         ],
       ),

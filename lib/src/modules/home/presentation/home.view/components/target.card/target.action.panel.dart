@@ -25,10 +25,13 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
       mainAxisAlignment: .spaceBetween,
       mainAxisSize: .min,
       children: [
-        IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: targetText))),
+        IconButton(
+          icon: Icon(Icons.copy),
+          onPressed: () => Clipboard.setData(ClipboardData(text: targetText)),
+        ),
         IconButton(
           onPressed: () async => _speak(text: targetText, languageCode: targetLanguageCode),
-          icon: Icon(Icons.speaker),
+          icon: Icon(Icons.volume_up),
         ),
         const IconButton(icon: Icon(Icons.bookmark), onPressed: null),
         const IconButton(icon: Icon(Icons.share), onPressed: null),
