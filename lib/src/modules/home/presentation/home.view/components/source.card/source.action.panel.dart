@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 
 import '../../providers/translator.dart';
 
@@ -69,7 +70,25 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             },
             icon: Icon(Icons.paste),
           ),
-          IconButton(onPressed: () {}, icon: Icon(Icons.mic)),
+          IconButton(
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (_) => SpeechListeningDialog(
+                  initialText: widget.controller?.text,
+                  localeId: sourceLanguageCode,
+                  onTextChanged: (value) {
+                    widget.controller?.text = value;
+                    widget.controller?.selection = TextSelection.fromPosition(
+                      TextPosition(offset: value.length),
+                    );
+                    ref.read(translatorProvider.notifier).setSourceText(value);
+                  },
+                ),
+              );
+            },
+            icon: Icon(Icons.mic),
+          ),
         ],
       ],
     );
