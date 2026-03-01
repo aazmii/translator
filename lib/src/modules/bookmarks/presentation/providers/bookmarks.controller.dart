@@ -3,6 +3,7 @@ import 'package:go_translator/src/modules/bookmarks/data/datasource/bookmarks.lo
 import 'package:go_translator/src/modules/bookmarks/data/repositories/bookmarks.repository.impl.dart';
 import 'package:go_translator/src/modules/bookmarks/domain/entities/bookmark.entity.dart';
 import 'package:go_translator/src/modules/bookmarks/domain/usecases/get.bookmarks.usecase.dart';
+import 'package:go_translator/src/modules/bookmarks/domain/usecases/remove.bookmark.usecase.dart';
 import 'package:go_translator/src/modules/bookmarks/domain/usecases/save.bookmark.usecase.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -41,6 +42,12 @@ class BookmarksController extends _$BookmarksController {
     );
 
     await usecase(p: bookmark);
+    await refresh();
+  }
+
+  Future<void> removeBookmark(String id) async {
+    final usecase = RemoveTranslationUsecase(_repository());
+    await usecase(p: id);
     await refresh();
   }
 }
