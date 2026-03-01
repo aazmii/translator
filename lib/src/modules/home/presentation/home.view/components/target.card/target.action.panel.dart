@@ -33,7 +33,6 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
           onPressed: () async => _speak(text: targetText, languageCode: targetLanguageCode),
           icon: Icon(Icons.volume_up),
         ),
-        const IconButton(icon: Icon(Icons.bookmark), onPressed: null),
         const IconButton(icon: Icon(Icons.share), onPressed: null),
       ],
     );
