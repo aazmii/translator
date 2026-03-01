@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
+import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 
@@ -45,7 +46,29 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             onPressed: () async => _speak(text: sourceText, languageCode: sourceLanguageCode),
             icon: Icon(Icons.volume_up),
           ),
-          IconButton(icon: Icon(Icons.bookmark), onPressed: null),
+          IconButton(
+            icon: Icon(Icons.bookmark),
+            onPressed: () async {
+              final source = translation?.sourceText?.trim();
+              if (source == null || source.isEmpty) return;
+
+              try {
+                await ref.read(bookmarksControllerProvider.notifier).saveBookmark(
+                      sourceText: source,
+                      targetText: translation?.translatedText,
+                    );
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Bookmarked')),
+                );
+              } catch (_) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to bookmark')),
+                );
+              }
+            },
+          ),
           Spacer(),
           IconButton(
             onPressed: () async {
