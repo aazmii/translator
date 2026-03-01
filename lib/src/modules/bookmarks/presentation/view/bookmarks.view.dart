@@ -20,11 +20,28 @@ class BookmarksView extends ConsumerWidget {
           return ListView.separated(
             itemCount: bookmarks.length,
             separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (_, index) {
+            itemBuilder: (context, index) {
               final bookmark = bookmarks[index];
-              return ListTile(
-                title: Text(bookmark.sourceText),
-                subtitle: bookmark.targetText?.isNotEmpty == true ? Text(bookmark.targetText!) : null,
+              return Dismissible(
+                key: ValueKey(bookmark.id),
+                direction: DismissDirection.endToStart,
+                background: Container(
+                  color: Colors.red,
+                  alignment: Alignment.centerRight,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: const Icon(Icons.delete, color: Colors.white),
+                ),
+                onDismissed: (_) async {
+                  await ref.read(bookmarksControllerProvider.notifier).removeBookmark(bookmark.id);
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Bookmark deleted')),
+                  );
+                },
+                child: ListTile(
+                  title: Text(bookmark.sourceText),
+                  subtitle: bookmark.targetText?.isNotEmpty == true ? Text(bookmark.targetText!) : null,
+                ),
               );
             },
           );
