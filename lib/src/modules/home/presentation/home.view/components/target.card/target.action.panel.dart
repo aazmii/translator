@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../providers/translator.dart';
 
 class TargetActionPanel extends ConsumerStatefulWidget {
@@ -33,7 +34,10 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
           onPressed: () async => _speak(text: targetText, languageCode: targetLanguageCode),
           icon: Icon(Icons.volume_up),
         ),
-        const IconButton(icon: Icon(Icons.share), onPressed: null),
+        IconButton(
+          icon: Icon(Icons.share),
+          onPressed: targetText.isNotEmpty ? () => SharePlus.instance.share(ShareParams(text: targetText)) : null,
+        ),
       ],
     );
   }
