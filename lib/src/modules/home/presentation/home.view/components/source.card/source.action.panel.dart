@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
+import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
@@ -53,18 +54,39 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               if (source == null || source.isEmpty) return;
 
               try {
-                await ref.read(bookmarksControllerProvider.notifier).saveBookmark(
-                      sourceText: source,
-                      targetText: translation?.translatedText,
-                    );
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Bookmarked')),
+                if (await ref.read(bookmarksControllerProvider.notifier).hasBookmark(source)) {
+                  Fluttertoast.showToast(
+                    msg: 'Already bookmarked',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black87,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                  return;
+                }
+
+                await ref
+                    .read(bookmarksControllerProvider.notifier)
+                    .saveBookmark(sourceText: source, targetText: translation?.translatedText);
+                Fluttertoast.showToast(
+                  msg: 'Bookmarked',
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } catch (_) {
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to bookmark')),
+                Fluttertoast.showToast(
+                  msg: 'Failed to bookmark',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               }
             },
@@ -102,9 +124,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
                   localeId: sourceLanguageCode,
                   onTextChanged: (value) {
                     widget.controller?.text = value;
-                    widget.controller?.selection = TextSelection.fromPosition(
-                      TextPosition(offset: value.length),
-                    );
+                    widget.controller?.selection = TextSelection.fromPosition(TextPosition(offset: value.length));
                     ref.read(translatorProvider.notifier).setSourceText(value);
                   },
                 ),

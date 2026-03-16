@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:go_translator/src/core/di/providers.dart';
 import 'package:go_translator/src/modules/bookmarks/data/datasource/bookmarks.local.datasource.impl.dart';
 import 'package:go_translator/src/modules/bookmarks/data/repositories/bookmarks.repository.impl.dart';
@@ -28,11 +29,19 @@ class BookmarksController extends _$BookmarksController {
     state = AsyncData(await usecase());
   }
 
+  Future<bool> hasBookmark(String text) async {
+    final source = text.trim();
+    if (source.isEmpty) return false;
+
+    final bookmarks = state.value ?? await GetSavedTranslationUsecase(_repository())();
+    final bookmarkTexts = bookmarks.map((bookmark) => bookmark.sourceText).toList(growable: false);
+    return compute(_hasBookmarkCompute, (texts: bookmarkTexts, source: source));
+  }
+
   Future<void> saveBookmark({required String sourceText, String? targetText}) async {
     final source = sourceText.trim();
-    if (source.isEmpty) {
-      return;
-    }
+    if (source.isEmpty) return;
+    // if (await hasBookmark(source)) return;
 
     final usecase = SaveBookmarkUsecase(_repository());
     final bookmark = BookmarkEntity(
@@ -50,4 +59,8 @@ class BookmarksController extends _$BookmarksController {
     await usecase(p: id);
     await refresh();
   }
+}
+
+bool _hasBookmarkCompute(({List<String> texts, String source}) payload) {
+  return payload.texts.any((text) => text.trim() == payload.source);
 }
