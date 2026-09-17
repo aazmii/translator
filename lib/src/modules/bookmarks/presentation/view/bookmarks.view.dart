@@ -32,7 +32,9 @@ class BookmarksView extends ConsumerWidget {
                   child: const Icon(Icons.delete, color: Colors.white),
                 ),
                 onDismissed: (_) async {
-                  await ref.read(bookmarksControllerProvider.notifier).removeBookmark(bookmark.id);
+                  await ref
+                      .read(bookmarksControllerProvider.notifier)
+                      .removeBookmark(bookmark.id);
                   if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Bookmark deleted')),
@@ -40,7 +42,9 @@ class BookmarksView extends ConsumerWidget {
                 },
                 child: ListTile(
                   title: Text(bookmark.sourceText),
-                  subtitle: bookmark.targetText?.isNotEmpty == true ? Text(bookmark.targetText!) : null,
+                  subtitle: bookmark.targetText?.isNotEmpty == true
+                      ? Text(bookmark.targetText!)
+                      : null,
                 ),
               );
             },

@@ -5,7 +5,12 @@ import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
 class SpeechListeningDialog extends StatefulWidget {
-  const SpeechListeningDialog({super.key, this.initialText, this.localeId, this.onTextChanged});
+  const SpeechListeningDialog({
+    super.key,
+    this.initialText,
+    this.localeId,
+    this.onTextChanged,
+  });
 
   final String? initialText;
   final String? localeId;
@@ -17,13 +22,16 @@ class SpeechListeningDialog extends StatefulWidget {
 
 class _SpeechListeningDialogState extends State<SpeechListeningDialog> {
   final SpeechToText _speech = SpeechToText();
-  final SpeechListenOptions _listenOptions = SpeechListenOptions(
+  SpeechListenOptions get _listenOptions => SpeechListenOptions(
     listenMode: ListenMode.dictation,
     onDevice: false,
     cancelOnError: true,
     partialResults: true,
     autoPunctuation: true,
     enableHapticFeedback: true,
+    listenFor: const Duration(seconds: 30),
+    pauseFor: const Duration(seconds: 8),
+    localeId: widget.localeId,
   );
 
   bool _speechEnabled = false;
@@ -46,7 +54,10 @@ class _SpeechListeningDialogState extends State<SpeechListeningDialog> {
 
   Future<void> _initSpeech() async {
     try {
-      final hasSpeech = await _speech.initialize(onError: _onError, onStatus: _onStatus);
+      final hasSpeech = await _speech.initialize(
+        onError: _onError,
+        onStatus: _onStatus,
+      );
       if (!mounted) return;
       setState(() {
         _speechEnabled = hasSpeech;
@@ -84,13 +95,7 @@ class _SpeechListeningDialogState extends State<SpeechListeningDialog> {
       _lastError = '';
     });
 
-    await _speech.listen(
-      onResult: _onResult,
-      listenFor: const Duration(seconds: 30),
-      pauseFor: const Duration(seconds: 8),
-      localeId: widget.localeId,
-      listenOptions: _listenOptions,
-    );
+    await _speech.listen(onResult: _onResult, listenOptions: _listenOptions);
 
     if (!mounted) return;
     setState(() {
@@ -138,7 +143,9 @@ class _SpeechListeningDialogState extends State<SpeechListeningDialog> {
                   padding: const EdgeInsets.only(bottom: 88),
                   child: Text(
                     _recognizedWords.isEmpty
-                        ? (_speechEnabled ? 'Tap mic and start speaking...' : 'Speech is unavailable')
+                        ? (_speechEnabled
+                              ? 'Tap mic and start speaking...'
+                              : 'Speech is unavailable')
                         : _recognizedWords,
                   ),
                 ),
@@ -163,7 +170,12 @@ class _SpeechListeningDialogState extends State<SpeechListeningDialog> {
                   left: 0,
                   right: 0,
                   bottom: 72,
-                  child: Text(_lastError, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                  child: Text(
+                    _lastError,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                  ),
                 ),
             ],
           ),

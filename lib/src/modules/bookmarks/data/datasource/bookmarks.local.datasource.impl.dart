@@ -34,6 +34,14 @@ class BookmarksLocalDataSourceImpl implements BookmarksLocalDataSource {
   }
 
   @override
+  Future<bool> containsSourceText(String sourceText) async {
+    final bookmarks = await getAll();
+    return bookmarks.any(
+      (bookmark) => bookmark.sourceText.trim() == sourceText,
+    );
+  }
+
+  @override
   Future<void> save(BookmarkModel model) {
     return box.put('$keyPrefix${model.id}', jsonEncode(model.toMap()));
   }

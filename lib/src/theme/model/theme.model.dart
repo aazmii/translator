@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/domain/entities/theme.profile.dart';
+import '../../modules/setting/domain/entities/theme_profile.dart';
 import '../themes/dark/dark.theme.dart';
 import '../themes/light/light.theme.dart';
 

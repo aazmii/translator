@@ -1,66 +1,36 @@
-import 'package:flutter/foundation.dart';
-import 'package:go_translator/src/core/di/providers.dart';
-import 'package:go_translator/src/modules/bookmarks/data/datasource/bookmarks.local.datasource.impl.dart';
-import 'package:go_translator/src/modules/bookmarks/data/repositories/bookmarks.repository.impl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_translator/src/config/di/providers.dart';
+import 'package:go_translator/src/core/usecase/usecase.dart';
 import 'package:go_translator/src/modules/bookmarks/domain/entities/bookmark.entity.dart';
-import 'package:go_translator/src/modules/bookmarks/domain/usecases/get.bookmarks.usecase.dart';
-import 'package:go_translator/src/modules/bookmarks/domain/usecases/remove.bookmark.usecase.dart';
-import 'package:go_translator/src/modules/bookmarks/domain/usecases/save.bookmark.usecase.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:go_translator/src/modules/bookmarks/domain/usecases/save_bookmark.dart';
 
-part 'bookmarks.controller.g.dart';
-
-@riverpod
-class BookmarksController extends _$BookmarksController {
-  BookmarksRepositoryImpl _repository() {
-    final box = ref.read(appBoxProvider);
-    final local = BookmarksLocalDataSourceImpl(box);
-    return BookmarksRepositoryImpl(local);
-  }
-
-  @override
-  Future<List<BookmarkEntity>> build() async {
-    final usecase = GetSavedTranslationUsecase(_repository());
-    return usecase();
-  }
-
-  Future<void> refresh() async {
-    final usecase = GetSavedTranslationUsecase(_repository());
-    state = AsyncData(await usecase());
-  }
-
-  Future<bool> hasBookmark(String text) async {
-    final source = text.trim();
-    if (source.isEmpty) return false;
-
-    final bookmarks = state.value ?? await GetSavedTranslationUsecase(_repository())();
-    final bookmarkTexts = bookmarks.map((bookmark) => bookmark.sourceText).toList(growable: false);
-    return compute(_hasBookmarkCompute, (texts: bookmarkTexts, source: source));
-  }
-
-  Future<void> saveBookmark({required String sourceText, String? targetText}) async {
-    final source = sourceText.trim();
-    if (source.isEmpty) return;
-    // if (await hasBookmark(source)) return;
-
-    final usecase = SaveBookmarkUsecase(_repository());
-    final bookmark = BookmarkEntity(
-      id: DateTime.now().microsecondsSinceEpoch.toString(),
-      sourceText: source,
-      targetText: targetText,
+final bookmarksControllerProvider =
+    AsyncNotifierProvider<BookmarksController, List<BookmarkEntity>>(
+      BookmarksController.new,
     );
 
-    await usecase(p: bookmark);
-    await refresh();
+final class BookmarksController extends AsyncNotifier<List<BookmarkEntity>> {
+  @override
+  Future<List<BookmarkEntity>> build() =>
+      ref.watch(getBookmarksProvider)(const NoParams());
+
+  Future<void> refresh() async {
+    state = AsyncData(await ref.read(getBookmarksProvider)(const NoParams()));
+  }
+
+  Future<bool> saveBookmark({
+    required String sourceText,
+    String? targetText,
+  }) async {
+    final saved = await ref.read(saveBookmarkProvider)(
+      SaveBookmarkParams(sourceText: sourceText, targetText: targetText),
+    );
+    if (saved) await refresh();
+    return saved;
   }
 
   Future<void> removeBookmark(String id) async {
-    final usecase = RemoveTranslationUsecase(_repository());
-    await usecase(p: id);
+    await ref.read(removeBookmarkProvider)(id);
     await refresh();
   }
-}
-
-bool _hasBookmarkCompute(({List<String> texts, String source}) payload) {
-  return payload.texts.any((text) => text.trim() == payload.source);
 }

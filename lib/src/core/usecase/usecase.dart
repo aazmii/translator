@@ -1,11 +1,9 @@
-abstract class UseCase<T, P> {
-  T call({P p});
+/// A domain operation with one explicit input and output type.
+abstract interface class UseCase<Result, Params> {
+  Result call(Params params);
 }
 
-abstract class AsyncUseCase<Typ, Params> {
-  Future<Typ> call({Params p});
-}
-
-abstract class StreamUseCase<Typ, Params> {
-  Stream<Typ> call({Params p});
+/// Used by use cases that do not require input.
+final class NoParams {
+  const NoParams();
 }

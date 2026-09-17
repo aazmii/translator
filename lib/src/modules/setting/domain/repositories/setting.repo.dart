@@ -1,9 +1,6 @@
+import '../entities/setting.entity.dart';
 
-
-abstract class SettingRepository {
-  Future saveSourceLanguage(String code);
-  String get getSourceLanguage;
-
-  void saveTargetLanguage(String code);
-  String get getTargetLanguage;
+abstract interface class SettingsRepository {
+  Future<AppSettings> getSettings();
+  Future<void> saveSettings(AppSettings settings);
 }

@@ -3,7 +3,7 @@ import 'package:flutter/services.dart' show DeviceOrientation, SystemChrome;
 import 'package:hive/hive.dart' show Box;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart' show ProviderScope;
-import 'package:go_translator/src/core/di/providers.dart' show appBoxProvider;
+import 'package:go_translator/src/config/di/providers.dart' show appBoxProvider;
 
 import 'src/app.dart' show MyApp;
 import 'src/core/db/hive.dart' show HiveDb;
@@ -11,7 +11,12 @@ import 'src/core/db/hive.dart' show HiveDb;
 void main() async {
   final appBox = await _init();
 
-  runApp(ProviderScope(overrides: [appBoxProvider.overrideWithValue(appBox)], child: const MyApp()));
+  runApp(
+    ProviderScope(
+      overrides: [appBoxProvider.overrideWithValue(appBox)],
+      child: const MyApp(),
+    ),
+  );
 }
 
 Future<Box<String>> _init() async {

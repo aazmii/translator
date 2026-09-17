@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/config/router/provider/route.provider.dart';
 import 'package:go_translator/src/core/extensions/extensions.dart';
+import 'package:go_translator/src/modules/languages/domain/entities/language.dart';
+import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
 import 'package:go_translator/src/modules/languages/presentation/view/offline.languages.view.dart';
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
 
 import '../../providers/translator.dart';
 
@@ -14,6 +15,8 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
   Widget build(BuildContext context, ref) {
     final sourceCode = ref.watch(translatorProvider).value?.sourceLanguageCode;
     final targetCode = ref.watch(translatorProvider).value?.targetLanguageCode;
+    final languages =
+        ref.watch(offlineLanguagesProvider).value ?? const <Language>[];
     return AppBar(
       title: ListTile(
         title: Row(
@@ -21,10 +24,23 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
           children: [
             Expanded(
               child: InkWell(
-                onTap: () {
-                  fadePush(context, OfflineLanguagesView(title: 'Translate From'));
+                onTap: () async {
+                  final code = await fadePush<String>(
+                    context,
+                    const OfflineLanguagesView(
+                      title: 'Translate From',
+                      selectionMode: true,
+                    ),
+                  );
+                  if (code != null) {
+                    await ref
+                        .read(translatorProvider.notifier)
+                        .setSourceLanguage(code);
+                  }
                 },
-                child: Center(child: Text(_languageName(sourceCode)?.capitalize ?? '')),
+                child: Center(
+                  child: Text(_languageName(languages, sourceCode).capitalize),
+                ),
               ),
             ),
             IconButton(
@@ -37,10 +53,23 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
             ),
             Expanded(
               child: InkWell(
-                onTap: () {
-                  fadePush(context, OfflineLanguagesView(title: 'Translate To'));
+                onTap: () async {
+                  final code = await fadePush<String>(
+                    context,
+                    const OfflineLanguagesView(
+                      title: 'Translate To',
+                      selectionMode: true,
+                    ),
+                  );
+                  if (code != null) {
+                    await ref
+                        .read(translatorProvider.notifier)
+                        .setTargetLanguage(code);
+                  }
                 },
-                child: Center(child: Text(_languageName(targetCode)?.capitalize ?? '')),
+                child: Center(
+                  child: Text(_languageName(languages, targetCode).capitalize),
+                ),
               ),
             ),
           ],
@@ -53,11 +82,11 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(60);
 }
 
-String? _languageName(String? code) {
-  if (code == null || code.isEmpty) return null;
-  final language = TranslateLanguage.values.firstWhere(
-    (e) => e.bcpCode == code,
-    orElse: () => TranslateLanguage.english,
+String _languageName(List<Language> languages, String? code) {
+  if (code == null || code.isEmpty) return '';
+  final language = languages.cast<Language?>().firstWhere(
+    (language) => language?.code == code,
+    orElse: () => null,
   );
-  return language.name;
+  return language?.name ?? code;
 }

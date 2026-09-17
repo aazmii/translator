@@ -1,5 +1,5 @@
 import '../../domain/entities/bookmark.entity.dart';
-import '../../domain/repositories/bookmarks.reopsitory.dart';
+import '../../domain/repositories/bookmarks_repository.dart';
 import '../datasource/bookmark.local.datasource.dart';
 import '../model/bookmark.model.dart';
 
@@ -13,6 +13,10 @@ class BookmarksRepositoryImpl implements BookmarksRepository {
     final models = await local.getAll();
     return models.map((m) => m.toEntity()).toList();
   }
+
+  @override
+  Future<bool> containsSourceText(String sourceText) =>
+      local.containsSourceText(sourceText);
 
   @override
   Future<void> save(BookmarkEntity translationEntity) {
