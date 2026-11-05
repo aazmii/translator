@@ -27,6 +27,7 @@ class CustomTextField extends StatelessWidget {
           TextFormField(
             focusNode: focusNode,
             controller: controller,
+            readOnly: readOnly ?? false,
             autofocus: autofocus!,
             expands: true,
             maxLines: null,

@@ -9,7 +9,4 @@ extension ThemeProfileExtension on ThemeProfile {
         return darkTheme;
     }
   }
-
-  ThemeProfile get toggled =>
-      this == ThemeProfile.light ? ThemeProfile.dark : ThemeProfile.light;
 }

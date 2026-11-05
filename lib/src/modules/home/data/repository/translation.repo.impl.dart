@@ -1,28 +1,40 @@
-import 'package:go_translator/src/modules/home/data/modles/translator.setting.dart';
-import 'package:go_translator/src/modules/home/domain/entities/translation.model.dart';
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:isar_community/isar.dart' show Isar;
+import '../../domain/entities/translation_settings.dart';
+import '../../domain/repositories/translation_repository.dart';
+import '../datasources/translation_local_data_source.dart';
+import '../datasources/translation_service_data_source.dart';
+import '../models/translation_settings_model.dart';
 
-import '../../domain/repository/home.repository.dart';
+final class TranslationRepositoryImpl implements TranslationRepository {
+  const TranslationRepositoryImpl(
+    this._localDataSource,
+    this._serviceDataSource,
+  );
 
-class TranslationRepositoryImpl implements TranslationRpository {
-  final Isar db;
-  TranslationRepositoryImpl(this.db);
+  final TranslationLocalDataSource _localDataSource;
+  final TranslationServiceDataSource _serviceDataSource;
+
   @override
-  Future<String?> translateText(OnDeviceTranslator translator, String text) {
-    return translator.translateText(text);
+  Future<String> translate({
+    required String sourceLanguageCode,
+    required String targetLanguageCode,
+    required String text,
+  }) async {
+    return _serviceDataSource.translate(
+      sourceLanguageCode: sourceLanguageCode,
+      targetLanguageCode: targetLanguageCode,
+      text: text,
+    );
   }
 
   @override
-  Future<TranslationSettingEntity?> getTranslationSetting() async {
-    final tSetting = await db.translatorSettings.get(0);
-    return tSetting?.toDomain();
+  Future<TranslationSettings?> getSettings() async {
+    return (await _localDataSource.getSettings())?.toEntity();
   }
 
   @override
-  Future saveTranslationSetting(TranslationSettingEntity tSetting) async {
-    await db.writeTxn(() async {
-      await db.translatorSettings.put(TranslatorSetting.fromDomain(tSetting));
-    });
+  Future<void> saveSettings(TranslationSettings settings) {
+    return _localDataSource.saveSettings(
+      TranslationSettingsModel.fromEntity(settings),
+    );
   }
 }

@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
+import 'package:fluttertoast/fluttertoast.dart'
+    show Fluttertoast, Toast, ToastGravity;
+import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 
 import '../../providers/translator.dart';
 
@@ -15,20 +20,16 @@ class SourceActionPanel extends ConsumerStatefulWidget {
 
 class _ActionPanelState extends ConsumerState<SourceActionPanel> {
   final _flutterTts = FlutterTts();
-  Map<String, String>? voice;
-  @override
-  void initState() {
-    super.initState();
-    _initTTS();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final sourceText = ref.watch(translatorProvider).value?.sourceText;
+    final translation = ref.watch(translatorProvider).value;
+    final sourceText = translation?.sourceText;
+    final sourceLanguageCode = translation?.sourceLanguageCode ?? 'en';
 
     return Column(
       mainAxisAlignment: .spaceBetween,
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: .min,
       children: [
         if (sourceText != null && sourceText.isNotEmpty) ...[
           IconButton(
@@ -39,16 +40,68 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             },
             icon: Icon(Icons.close),
           ),
-          IconButton(icon: Icon(Icons.copy), onPressed: () => Clipboard.setData(ClipboardData(text: sourceText))),
           IconButton(
-            onPressed: () async => await _flutterTts.speak(sourceText),
-            icon: Icon(Icons.speaker),
+            icon: Icon(Icons.paste),
+            onPressed: () => Clipboard.setData(ClipboardData(text: sourceText)),
           ),
-          IconButton(icon: Icon(Icons.bookmark), onPressed: null),
+          IconButton(
+            onPressed: () async =>
+                _speak(text: sourceText, languageCode: sourceLanguageCode),
+            icon: Icon(Icons.volume_up),
+          ),
+          IconButton(
+            icon: Icon(Icons.bookmark),
+            onPressed: () async {
+              final source = translation?.sourceText?.trim();
+              if (source == null || source.isEmpty) return;
+
+              try {
+                final saved = await ref
+                    .read(bookmarksControllerProvider.notifier)
+                    .saveBookmark(
+                      sourceText: source,
+                      targetText: translation?.translatedText,
+                    );
+                if (!saved) {
+                  Fluttertoast.showToast(
+                    msg: 'Already bookmarked',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black87,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                  return;
+                }
+
+                Fluttertoast.showToast(
+                  msg: 'Bookmarked',
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              } catch (_) {
+                Fluttertoast.showToast(
+                  msg: 'Failed to bookmark',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
+                );
+              }
+            },
+          ),
           Spacer(),
           IconButton(
             onPressed: () async {
-              ref.read(translatorProvider.notifier).setSourceText(widget.controller?.text ?? '');
+              ref
+                  .read(translatorProvider.notifier)
+                  .setSourceText(widget.controller?.text ?? '');
               await ref.read(translatorProvider.notifier).translate();
               if (context.mounted) FocusScope.of(context).unfocus();
             },
@@ -70,32 +123,35 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             icon: Icon(Icons.paste),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              showDialog<void>(
+                context: context,
+                builder: (_) => SpeechListeningDialog(
+                  initialText: widget.controller?.text,
+                  localeId: sourceLanguageCode,
+                  onTextChanged: (value) {
+                    widget.controller?.text = value;
+                    widget.controller?.selection = TextSelection.fromPosition(
+                      TextPosition(offset: value.length),
+                    );
+                    ref.read(translatorProvider.notifier).setSourceText(value);
+                  },
+                ),
+              );
+            },
             icon: Icon(Icons.mic),
           ),
-        ]
+        ],
       ],
     );
   }
 
-  void _initTTS() async {
-    var voices = await _flutterTts.getVoices;
-
-    var defaultVoiceRaw = await _flutterTts.getDefaultVoice;
-
-    Map<String, String> defaultVoice = Map<String, String>.from(defaultVoiceRaw);
-
-    if (voices.any((v) => v['name'] == defaultVoice['name'])) {
-      await _flutterTts.setVoice({
-        'name': defaultVoice['name']!,
-        'locale': defaultVoice['locale']!,
-      });
-    } else {
-      await _flutterTts.setLanguage('en-US');
-    }
-
-    setState(() {
-      voice = defaultVoice;
-    });
+  /// it should open speech to text instead
+  Future<void> _speak({
+    required String text,
+    required String languageCode,
+  }) async {
+    await setTtsLanguage(_flutterTts, languageCode);
+    await _flutterTts.speak(text);
   }
 }

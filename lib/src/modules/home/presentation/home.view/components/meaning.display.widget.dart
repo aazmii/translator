@@ -14,7 +14,7 @@ class TranslationDisplayWidget extends StatelessWidget {
         Expanded(
           child: Card(
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 Expanded(child: CustomTextField()),
                 SourceActionPanel(text: targetText),

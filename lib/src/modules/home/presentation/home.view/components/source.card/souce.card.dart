@@ -41,7 +41,7 @@ class _SourceCardState extends ConsumerState<SourceCard> {
   Widget build(BuildContext context) {
     return Card(
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: .start,
         children: [
           Expanded(
             child: CustomTextField(
