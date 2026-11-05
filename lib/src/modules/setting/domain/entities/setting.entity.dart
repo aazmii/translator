@@ -1,19 +1,15 @@
-import 'package:go_translator/src/core/domain/entities/theme.profile.dart';
+import 'theme_profile.dart';
 
-class AppSetting {
-  AppSetting({
-    this.id = 0,
-    this.firstRun,
-    this.theme = ThemeProfile.light,
-    this.sourceLanguageCode,
-    this.targetLanguageCod,
-  });
+final class AppSettings {
+  const AppSettings({this.firstRun = true, this.theme = ThemeProfile.light});
 
-  final int id;
-
-  final bool? firstRun;
-
+  final bool firstRun;
   final ThemeProfile theme;
-  
-  String? sourceLanguageCode, targetLanguageCod;
+
+  AppSettings copyWith({bool? firstRun, ThemeProfile? theme}) {
+    return AppSettings(
+      firstRun: firstRun ?? this.firstRun,
+      theme: theme ?? this.theme,
+    );
+  }
 }

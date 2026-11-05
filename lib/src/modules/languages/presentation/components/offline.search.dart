@@ -9,7 +9,8 @@ class ExpandableSearchBox extends StatefulWidget {
   State<ExpandableSearchBox> createState() => _ExpandableSearchBoxState();
 }
 
-class _ExpandableSearchBoxState extends State<ExpandableSearchBox> with SingleTickerProviderStateMixin {
+class _ExpandableSearchBoxState extends State<ExpandableSearchBox>
+    with SingleTickerProviderStateMixin {
   // bool _isExpanded = false;
   late final FocusNode _focusNode;
   late final TextEditingController _controller;
@@ -43,8 +44,8 @@ class _ExpandableSearchBoxState extends State<ExpandableSearchBox> with SingleTi
       width: _isExpanded ? 200 : 50,
       curve: Curves.easeIn,
       height: 58,
-      // padding: const EdgeInsets.symmetric(horizontal: 8),
 
+      // padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
         mainAxisAlignment: .end,
         children: [
@@ -53,12 +54,18 @@ class _ExpandableSearchBoxState extends State<ExpandableSearchBox> with SingleTi
               child: TextFormField(
                 controller: widget.controller,
                 focusNode: _focusNode,
-                decoration: InputDecoration(fillColor: Colors.red, filled: true),
+                decoration: InputDecoration(
+                  fillColor: Colors.red,
+                  filled: true,
+                ),
               ),
             ),
           IconButton(
             splashRadius: 30,
-            icon: Icon(_isExpanded ? Icons.close : Icons.search, color: Theme.of(context).colorScheme.primary),
+            icon: Icon(
+              _isExpanded ? Icons.close : Icons.search,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             onPressed: _toggle,
           ),
         ],

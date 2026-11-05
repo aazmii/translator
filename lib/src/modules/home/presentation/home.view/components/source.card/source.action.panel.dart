@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
+import 'package:fluttertoast/fluttertoast.dart'
+    show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
@@ -43,7 +45,8 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             onPressed: () => Clipboard.setData(ClipboardData(text: sourceText)),
           ),
           IconButton(
-            onPressed: () async => _speak(text: sourceText, languageCode: sourceLanguageCode),
+            onPressed: () async =>
+                _speak(text: sourceText, languageCode: sourceLanguageCode),
             icon: Icon(Icons.volume_up),
           ),
           IconButton(
@@ -53,18 +56,42 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               if (source == null || source.isEmpty) return;
 
               try {
-                await ref.read(bookmarksControllerProvider.notifier).saveBookmark(
+                final saved = await ref
+                    .read(bookmarksControllerProvider.notifier)
+                    .saveBookmark(
                       sourceText: source,
                       targetText: translation?.translatedText,
                     );
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Bookmarked')),
+                if (!saved) {
+                  Fluttertoast.showToast(
+                    msg: 'Already bookmarked',
+                    toastLength: Toast.LENGTH_SHORT,
+                    gravity: ToastGravity.CENTER,
+                    timeInSecForIosWeb: 1,
+                    backgroundColor: Colors.black87,
+                    textColor: Colors.white,
+                    fontSize: 16.0,
+                  );
+                  return;
+                }
+
+                Fluttertoast.showToast(
+                  msg: 'Bookmarked',
+                  toastLength: Toast.LENGTH_SHORT,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               } catch (_) {
-                if (!mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to bookmark')),
+                Fluttertoast.showToast(
+                  msg: 'Failed to bookmark',
+                  toastLength: Toast.LENGTH_SHORT,
+                  gravity: ToastGravity.CENTER,
+                  timeInSecForIosWeb: 1,
+                  backgroundColor: Colors.black87,
+                  textColor: Colors.white,
+                  fontSize: 16.0,
                 );
               }
             },
@@ -72,7 +99,9 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
           Spacer(),
           IconButton(
             onPressed: () async {
-              ref.read(translatorProvider.notifier).setSourceText(widget.controller?.text ?? '');
+              ref
+                  .read(translatorProvider.notifier)
+                  .setSourceText(widget.controller?.text ?? '');
               await ref.read(translatorProvider.notifier).translate();
               if (context.mounted) FocusScope.of(context).unfocus();
             },
@@ -118,7 +147,10 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
   }
 
   /// it should open speech to text instead
-  Future<void> _speak({required String text, required String languageCode}) async {
+  Future<void> _speak({
+    required String text,
+    required String languageCode,
+  }) async {
     await setTtsLanguage(_flutterTts, languageCode);
     await _flutterTts.speak(text);
   }

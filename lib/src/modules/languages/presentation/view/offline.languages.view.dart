@@ -1,16 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/core/extensions/extensions.dart';
-import 'package:go_translator/src/modules/home/presentation/home.view/providers/translator.dart';
 import 'package:go_translator/src/modules/languages/presentation/components/expandabe.search.app.bar.dart';
 import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
 
 class OfflineLanguagesView extends ConsumerStatefulWidget {
-  const OfflineLanguagesView({super.key, required this.title});
+  const OfflineLanguagesView({
+    super.key,
+    required this.title,
+    this.selectionMode = false,
+  });
+
   final String title;
+  final bool selectionMode;
 
   @override
-  ConsumerState<OfflineLanguagesView> createState() => _OfflineLanguagesViewState();
+  ConsumerState<OfflineLanguagesView> createState() =>
+      _OfflineLanguagesViewState();
 }
 
 class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
@@ -39,7 +45,9 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
-          physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+          physics: BouncingScrollPhysics(
+            parent: AlwaysScrollableScrollPhysics(),
+          ),
           itemCount: languages.length,
           itemBuilder: (context, i) {
             final language = languages[i];
@@ -48,17 +56,28 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
                 mainAxisSize: .min,
                 crossAxisAlignment: .start,
                 children: [
-                  Text('Recent Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
+                  Text(
+                    'Recent Languages',
+                    style: TextStyle(color: context.theme.colorScheme.primary),
+                  ),
                   ListTile(
-                    onTap: () => _pickLanguage(context, ref, widget.title, language.code),
+                    onTap: widget.selectionMode
+                        ? () => Navigator.pop(context, language.code)
+                        : null,
                     title: Text(language.name.capitalize),
                     trailing: IconButton(
-                      icon: Icon(language.isDownloaded ? Icons.delete : Icons.download),
+                      icon: Icon(
+                        language.isDownloaded ? Icons.delete : Icons.download,
+                      ),
                       onPressed: () {
                         if (language.isDownloaded) {
-                          ref.read(offlineLanguagesProvider.notifier).deleteLanguage(language.code);
+                          ref
+                              .read(offlineLanguagesProvider.notifier)
+                              .deleteLanguage(language.code);
                         } else {
-                          ref.read(offlineLanguagesProvider.notifier).downloadLanguage(language.code);
+                          ref
+                              .read(offlineLanguagesProvider.notifier)
+                              .downloadLanguage(language.code);
                         }
                       },
                     ),
@@ -71,17 +90,28 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
                 mainAxisSize: .min,
                 crossAxisAlignment: .start,
                 children: [
-                  Text('Other Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
+                  Text(
+                    'Other Languages',
+                    style: TextStyle(color: context.theme.colorScheme.primary),
+                  ),
                   ListTile(
-                    onTap: () => _pickLanguage(context, ref, widget.title, language.code),
+                    onTap: widget.selectionMode
+                        ? () => Navigator.pop(context, language.code)
+                        : null,
                     title: Text(language.name.capitalize),
                     trailing: IconButton(
-                      icon: Icon(language.isDownloaded ? Icons.delete : Icons.download),
+                      icon: Icon(
+                        language.isDownloaded ? Icons.delete : Icons.download,
+                      ),
                       onPressed: () {
                         if (language.isDownloaded) {
-                          ref.read(offlineLanguagesProvider.notifier).deleteLanguage(language.code);
+                          ref
+                              .read(offlineLanguagesProvider.notifier)
+                              .deleteLanguage(language.code);
                         } else {
-                          ref.read(offlineLanguagesProvider.notifier).downloadLanguage(language.code);
+                          ref
+                              .read(offlineLanguagesProvider.notifier)
+                              .downloadLanguage(language.code);
                         }
                       },
                     ),
@@ -90,15 +120,23 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
               );
             }
             return ListTile(
-              onTap: () => _pickLanguage(context, ref, widget.title, language.code),
+              onTap: widget.selectionMode
+                  ? () => Navigator.pop(context, language.code)
+                  : null,
               title: Text(language.name.capitalize),
               trailing: IconButton(
-                icon: Icon(language.isDownloaded ? Icons.delete : Icons.download),
+                icon: Icon(
+                  language.isDownloaded ? Icons.delete : Icons.download,
+                ),
                 onPressed: () {
                   if (language.isDownloaded) {
-                    ref.read(offlineLanguagesProvider.notifier).deleteLanguage(language.code);
+                    ref
+                        .read(offlineLanguagesProvider.notifier)
+                        .deleteLanguage(language.code);
                   } else {
-                    ref.read(offlineLanguagesProvider.notifier).downloadLanguage(language.code);
+                    ref
+                        .read(offlineLanguagesProvider.notifier)
+                        .downloadLanguage(language.code);
                   }
                 },
               ),
@@ -107,16 +145,5 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
         ),
       ),
     );
-  }
-
-  _pickLanguage(BuildContext context, WidgetRef ref, String title, String pickedLanguageCode) {
-    {
-      if (title.toLowerCase().contains('to')) {
-        ref.read(translatorProvider.notifier).setTargetLanguage = pickedLanguageCode;
-      } else {
-        ref.read(translatorProvider.notifier).setSourceLanguage = pickedLanguageCode;
-      }
-      context.pop();
-    }
   }
 }

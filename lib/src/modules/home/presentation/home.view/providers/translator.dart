@@ -1,70 +1,136 @@
-import 'package:go_translator/src/core/di/providers.dart';
-import 'package:go_translator/src/modules/home/domain/entities/translation.model.dart';
-import 'package:google_mlkit_translation/google_mlkit_translation.dart';
-import 'package:go_translator/src/modules/home/domain/repository/home.repository.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_translator/src/config/di/providers.dart';
+import 'package:go_translator/src/core/usecase/usecase.dart';
+import 'package:go_translator/src/modules/home/domain/entities/translation_settings.dart';
+import 'package:go_translator/src/modules/home/domain/usecases/translate_text.dart';
 
-part 'translator.g.dart';
+final translatorProvider = AsyncNotifierProvider<Translator, TranslatorState>(
+  Translator.new,
+);
 
-@Riverpod(keepAlive: true)
-class Translator extends _$Translator {
-  late TranslationRpository _translatorRepo;
+final class TranslatorState {
+  const TranslatorState({
+    required this.sourceLanguageCode,
+    required this.targetLanguageCode,
+    this.sourceText,
+    this.translatedText,
+  });
+
+  final String sourceLanguageCode;
+  final String targetLanguageCode;
+  final String? sourceText;
+  final String? translatedText;
+
+  static const _notProvided = Object();
+
+  TranslatorState copyWith({
+    String? sourceLanguageCode,
+    String? targetLanguageCode,
+    Object? sourceText = _notProvided,
+    Object? translatedText = _notProvided,
+  }) {
+    return TranslatorState(
+      sourceLanguageCode: sourceLanguageCode ?? this.sourceLanguageCode,
+      targetLanguageCode: targetLanguageCode ?? this.targetLanguageCode,
+      sourceText: sourceText == _notProvided
+          ? this.sourceText
+          : sourceText as String?,
+      translatedText: translatedText == _notProvided
+          ? this.translatedText
+          : translatedText as String?,
+    );
+  }
+}
+
+final class Translator extends AsyncNotifier<TranslatorState> {
   @override
-  Future<TranslationSettingEntity?> build() async {
-    _translatorRepo = ref.read(translationRepositoryProvider);
-
-    // try to fetch saved settings
-    final saved = await _translatorRepo.getTranslationSetting();
-
-    // if no record exists, create default and persist it
+  Future<TranslatorState> build() async {
+    final saved = await ref.watch(getTranslationSettingsProvider)(
+      const NoParams(),
+    );
+    final settings =
+        saved ??
+        const TranslationSettings(
+          sourceLanguageCode: 'en',
+          targetLanguageCode: 'fr',
+        );
     if (saved == null) {
-      final defaultSetting = TranslationSettingEntity(
-        sourceLanguageCode: TranslateLanguage.english.bcpCode,
-        targetLanguageCode: TranslateLanguage.french.bcpCode,
-      );
-      await _translatorRepo.saveTranslationSetting(defaultSetting);
-      return defaultSetting;
+      await ref.read(saveTranslationSettingsProvider)(settings);
     }
-
-    return saved;
+    return TranslatorState(
+      sourceLanguageCode: settings.sourceLanguageCode,
+      targetLanguageCode: settings.targetLanguageCode,
+    );
   }
 
-  TranslationSettingEntity? get value => state.value;
+  TranslatorState? get value => state.value;
+
   Future<void> swapLanguage() async {
-    state = AsyncData(value?.copyWith(
-      sourceLanguageCode: value?.targetLanguageCode,
-      targetLanguageCode: value?.sourceLanguageCode,
-    ));
-    await _translatorRepo.saveTranslationSetting(value!);
+    final current = value;
+    if (current == null) return;
+    final updated = current.copyWith(
+      sourceLanguageCode: current.targetLanguageCode,
+      targetLanguageCode: current.sourceLanguageCode,
+    );
+    state = AsyncData(updated);
+    await _saveLanguageSettings(updated);
   }
 
   void setSourceText(String? s) {
-    state = AsyncData(value?.copyWith(sourceText: s));
+    final current = value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(sourceText: s));
   }
 
   Future<void> translate() async {
-    if (value?.sourceText == null || value!.sourceText!.isEmpty) return;
-    final translatedText = await _translatorRepo.translateText(
-      sourceLanguageCode: value!.sourceLanguageCode,
-      targetLanguageCode: value!.targetLanguageCode,
-      text: value!.sourceText!,
+    final current = value;
+    if (current == null || current.sourceText?.trim().isEmpty != false) return;
+    final translatedText = await ref.read(translateTextProvider)(
+      TranslateTextParams(
+        sourceLanguageCode: current.sourceLanguageCode,
+        targetLanguageCode: current.targetLanguageCode,
+        text: current.sourceText!,
+      ),
     );
-    state = AsyncData(value?.copyWith(translatedText: translatedText));
+    state = AsyncData(current.copyWith(translatedText: translatedText));
   }
 
-  set setSourceLanguage(String code) {
-    if (code == value?.targetLanguageCode) swapLanguage();
-    state = AsyncData(value?.copyWith(sourceLanguageCode: code));
-    _translatorRepo.saveTranslationSetting(value!);
+  Future<void> setSourceLanguage(String code) async {
+    final current = value;
+    if (current == null) return;
+    if (code == current.targetLanguageCode) {
+      await swapLanguage();
+      return;
+    }
+    final updated = current.copyWith(sourceLanguageCode: code);
+    state = AsyncData(updated);
+    await _saveLanguageSettings(updated);
   }
 
-  set setTargetLanguage(String code) {
-    if (code == value?.targetLanguageCode) swapLanguage();
-    state = AsyncData(value?.copyWith(targetLanguageCode: code));
-    _translatorRepo.saveTranslationSetting(value!);
+  Future<void> setTargetLanguage(String code) async {
+    final current = value;
+    if (current == null) return;
+    if (code == current.sourceLanguageCode) {
+      await swapLanguage();
+      return;
+    }
+    final updated = current.copyWith(targetLanguageCode: code);
+    state = AsyncData(updated);
+    await _saveLanguageSettings(updated);
   }
 
   void clear() {
-    state = AsyncData(value?.copyWith(sourceText: null, translatedText: null));
+    final current = value;
+    if (current == null) return;
+    state = AsyncData(current.copyWith(sourceText: null, translatedText: null));
+  }
+
+  Future<void> _saveLanguageSettings(TranslatorState value) {
+    return ref.read(saveTranslationSettingsProvider)(
+      TranslationSettings(
+        sourceLanguageCode: value.sourceLanguageCode,
+        targetLanguageCode: value.targetLanguageCode,
+      ),
+    );
   }
 }

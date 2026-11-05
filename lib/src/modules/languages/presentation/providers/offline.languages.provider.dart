@@ -1,28 +1,39 @@
-import 'package:go_translator/src/core/di/providers.dart';
-import 'package:go_translator/src/core/domain/entities/language.entity.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_translator/src/config/di/providers.dart';
+import 'package:go_translator/src/core/usecase/usecase.dart';
 
-import '../../domain/repository/offline.translation.reopsitory.dart';
-part 'offline.languages.provider.g.dart';
+import '../../domain/entities/language.dart';
 
-@riverpod
-class OfflineLanguages extends _$OfflineLanguages {
-  late OfflineLanguageRepository _repo;
-  late List<LanguageEntity> languageList;
+final offlineLanguagesProvider =
+    AsyncNotifierProvider<OfflineLanguages, List<Language>>(
+      OfflineLanguages.new,
+    );
+
+final class OfflineLanguages extends AsyncNotifier<List<Language>> {
   @override
-  Future<List<LanguageEntity>> build() async {
-    _repo = ref.read(offlineLanguageRepositoryProvider);
-    final getLanguages = ref.read(getOfflineLanguageUseCaseProvider);
-    languageList = await getLanguages();
-    final sorted = [...languageList.where((l) => l.isDownloaded), ...languageList.where((l) => !l.isDownloaded)];
-    return sorted;
+  Future<List<Language>> build() async {
+    return _loadLanguages();
   }
 
   Future<bool> deleteLanguage(String code) async {
-    return await _repo.deleteLanguage(code);
+    final deleted = await ref.read(deleteLanguageProvider)(code);
+    if (deleted) state = AsyncData(await _loadLanguages());
+    return deleted;
   }
 
   Future<bool> downloadLanguage(String code) async {
-    return await _repo.downloadLanguage(code);
+    final downloaded = await ref.read(downloadLanguageProvider)(code);
+    if (downloaded) state = AsyncData(await _loadLanguages());
+    return downloaded;
+  }
+
+  Future<List<Language>> _loadLanguages() async {
+    final languages = await ref.read(getOfflineLanguagesProvider)(
+      const NoParams(),
+    );
+    return [
+      ...languages.where((language) => language.isDownloaded),
+      ...languages.where((language) => !language.isDownloaded),
+    ];
   }
 }

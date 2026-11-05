@@ -1,1 +1,0 @@
-enum ThemeProfile { light, dark }

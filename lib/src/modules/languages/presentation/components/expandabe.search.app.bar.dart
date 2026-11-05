@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
-class ExpandableSearchAppBar extends StatefulWidget implements PreferredSizeWidget {
+class ExpandableSearchAppBar extends StatefulWidget
+    implements PreferredSizeWidget {
   final ValueChanged<String>? onChanged;
   final String? title;
-  const ExpandableSearchAppBar({super.key, this.onChanged, this.hintText, this.title});
+  const ExpandableSearchAppBar({
+    super.key,
+    this.onChanged,
+    this.hintText,
+    this.title,
+  });
   final String? hintText;
   @override
   State<ExpandableSearchAppBar> createState() => _ExpandableSearchAppBarState();
