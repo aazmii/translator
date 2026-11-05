@@ -10,20 +10,20 @@ part of 'offline.languages.provider.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(OfflineLanguages)
-const offlineLanguagesProvider = OfflineLanguagesProvider._();
+final offlineLanguagesProvider = OfflineLanguagesProvider._();
 
 final class OfflineLanguagesProvider
     extends $AsyncNotifierProvider<OfflineLanguages, List<LanguageEntity>> {
-  const OfflineLanguagesProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'offlineLanguagesProvider',
-          isAutoDispose: true,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  OfflineLanguagesProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'offlineLanguagesProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$offlineLanguagesHash();
@@ -39,15 +39,21 @@ abstract class _$OfflineLanguages extends $AsyncNotifier<List<LanguageEntity>> {
   FutureOr<List<LanguageEntity>> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
-    final ref = this.ref
-        as $Ref<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>,
-        AsyncValue<List<LanguageEntity>>,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<AsyncValue<List<LanguageEntity>>, List<LanguageEntity>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<List<LanguageEntity>>,
+                List<LanguageEntity>
+              >,
+              AsyncValue<List<LanguageEntity>>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
   }
 }

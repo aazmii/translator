@@ -7,7 +7,7 @@ part of 'translator.setting.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types, experimental_member_use
 
 extension GetTranslatorSettingCollection on Isar {
   IsarCollection<TranslatorSetting> get translatorSettings => this.collection();
@@ -17,17 +17,19 @@ const TranslatorSettingSchema = CollectionSchema(
   name: r'TranslatorSetting',
   id: -5159482568713148981,
   properties: {
+    r'json': PropertySchema(id: 0, name: r'json', type: IsarType.string),
     r'sourceLang': PropertySchema(
-      id: 0,
+      id: 1,
       name: r'sourceLang',
       type: IsarType.string,
     ),
     r'targetLang': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'targetLang',
       type: IsarType.string,
-    )
+    ),
   },
+
   estimateSize: _translatorSettingEstimateSize,
   serialize: _translatorSettingSerialize,
   deserialize: _translatorSettingDeserialize,
@@ -36,10 +38,11 @@ const TranslatorSettingSchema = CollectionSchema(
   indexes: {},
   links: {},
   embeddedSchemas: {},
+
   getId: _translatorSettingGetId,
   getLinks: _translatorSettingGetLinks,
   attach: _translatorSettingAttach,
-  version: '3.3.0-dev.3',
+  version: '3.4.1',
 );
 
 int _translatorSettingEstimateSize(
@@ -48,6 +51,12 @@ int _translatorSettingEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.json;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.sourceLang;
     if (value != null) {
@@ -69,8 +78,9 @@ void _translatorSettingSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.sourceLang);
-  writer.writeString(offsets[1], object.targetLang);
+  writer.writeString(offsets[0], object.json);
+  writer.writeString(offsets[1], object.sourceLang);
+  writer.writeString(offsets[2], object.targetLang);
 }
 
 TranslatorSetting _translatorSettingDeserialize(
@@ -81,8 +91,9 @@ TranslatorSetting _translatorSettingDeserialize(
 ) {
   final object = TranslatorSetting();
   object.id = id;
-  object.sourceLang = reader.readStringOrNull(offsets[0]);
-  object.targetLang = reader.readStringOrNull(offsets[1]);
+  object.json = reader.readStringOrNull(offsets[0]);
+  object.sourceLang = reader.readStringOrNull(offsets[1]);
+  object.targetLang = reader.readStringOrNull(offsets[2]);
   return object;
 }
 
@@ -97,6 +108,8 @@ P _translatorSettingDeserializeProp<P>(
       return (reader.readStringOrNull(offset)) as P;
     case 1:
       return (reader.readStringOrNull(offset)) as P;
+    case 2:
+      return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -107,12 +120,16 @@ Id _translatorSettingGetId(TranslatorSetting object) {
 }
 
 List<IsarLinkBase<dynamic>> _translatorSettingGetLinks(
-    TranslatorSetting object) {
+  TranslatorSetting object,
+) {
   return [];
 }
 
 void _translatorSettingAttach(
-    IsarCollection<dynamic> col, Id id, TranslatorSetting object) {
+  IsarCollection<dynamic> col,
+  Id id,
+  TranslatorSetting object,
+) {
   object.id = id;
 }
 
@@ -128,17 +145,14 @@ extension TranslatorSettingQueryWhereSort
 extension TranslatorSettingQueryWhere
     on QueryBuilder<TranslatorSetting, TranslatorSetting, QWhereClause> {
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterWhereClause>
-      idEqualTo(Id id) {
+  idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: id,
-        upper: id,
-      ));
+      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterWhereClause>
-      idNotEqualTo(Id id) {
+  idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -161,7 +175,7 @@ extension TranslatorSettingQueryWhere
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterWhereClause>
-      idGreaterThan(Id id, {bool include = false}) {
+  idGreaterThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -170,7 +184,7 @@ extension TranslatorSettingQueryWhere
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterWhereClause>
-      idLessThan(Id id, {bool include = false}) {
+  idLessThan(Id id, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -179,19 +193,21 @@ extension TranslatorSettingQueryWhere
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterWhereClause>
-      idBetween(
+  idBetween(
     Id lowerId,
     Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(
-        lower: lowerId,
-        includeLower: includeLower,
-        upper: upperId,
-        includeUpper: includeUpper,
-      ));
+      return query.addWhereClause(
+        IdWhereClause.between(
+          lower: lowerId,
+          includeLower: includeLower,
+          upper: upperId,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 }
@@ -199,127 +215,129 @@ extension TranslatorSettingQueryWhere
 extension TranslatorSettingQueryFilter
     on QueryBuilder<TranslatorSetting, TranslatorSetting, QFilterCondition> {
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      idEqualTo(Id value) {
+  idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'id', value: value),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      idGreaterThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idGreaterThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      idLessThan(
-    Id value, {
-    bool include = false,
-  }) {
+  idLessThan(Id value, {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'id',
-        value: value,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'id',
+          value: value,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      idBetween(
+  idBetween(
     Id lower,
     Id upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'id',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'id',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangIsNull() {
+  jsonIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'sourceLang',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'json'),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangIsNotNull() {
+  jsonIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'sourceLang',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'json'),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
+  jsonEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangLessThan(
+  jsonGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangBetween(
+  jsonLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  jsonBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -327,153 +345,158 @@ extension TranslatorSettingQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'sourceLang',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'json',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  jsonStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+  jsonEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangContains(String value, {bool caseSensitive = true}) {
+  jsonContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'sourceLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'json',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangMatches(String pattern, {bool caseSensitive = true}) {
+  jsonMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'sourceLang',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'json',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangIsEmpty() {
+  jsonIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'sourceLang',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'json', value: ''),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      sourceLangIsNotEmpty() {
+  jsonIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'sourceLang',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'json', value: ''),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangIsNull() {
+  sourceLangIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'targetLang',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'sourceLang'),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangIsNotNull() {
+  sourceLangIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'targetLang',
-      ));
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'sourceLang'),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
+  sourceLangEqualTo(String? value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangLessThan(
+  sourceLangGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangBetween(
+  sourceLangLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -481,84 +504,245 @@ extension TranslatorSettingQueryFilter
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'targetLang',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'sourceLang',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangStartsWith(
-    String value, {
+  sourceLangStartsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangEndsWith(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'sourceLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'sourceLang',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'sourceLang', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  sourceLangIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'sourceLang', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNull(property: r'targetLang'),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        const FilterCondition.isNotNull(property: r'targetLang'),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangEqualTo(String? value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangGreaterThan(
+    String? value, {
+    bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(
+          include: include,
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangEndsWith(
-    String value, {
+  targetLangLessThan(
+    String? value, {
+    bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.lessThan(
+          include: include,
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangContains(String value, {bool caseSensitive = true}) {
+  targetLangBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'targetLang',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.between(
+          property: r'targetLang',
+          lower: lower,
+          includeLower: includeLower,
+          upper: upper,
+          includeUpper: includeUpper,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangMatches(String pattern, {bool caseSensitive = true}) {
+  targetLangStartsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'targetLang',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
+      return query.addFilterCondition(
+        FilterCondition.startsWith(
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangIsEmpty() {
+  targetLangEndsWith(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'targetLang',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.endsWith(
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
-      targetLangIsNotEmpty() {
+  targetLangContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'targetLang',
-        value: '',
-      ));
+      return query.addFilterCondition(
+        FilterCondition.contains(
+          property: r'targetLang',
+          value: value,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.matches(
+          property: r'targetLang',
+          wildcard: pattern,
+          caseSensitive: caseSensitive,
+        ),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.equalTo(property: r'targetLang', value: ''),
+      );
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterFilterCondition>
+  targetLangIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(
+        FilterCondition.greaterThan(property: r'targetLang', value: ''),
+      );
     });
   }
 }
@@ -572,28 +756,42 @@ extension TranslatorSettingQueryLinks
 extension TranslatorSettingQuerySortBy
     on QueryBuilder<TranslatorSetting, TranslatorSetting, QSortBy> {
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      sortBySourceLang() {
+  sortByJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'json', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
+  sortByJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'json', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
+  sortBySourceLang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceLang', Sort.asc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      sortBySourceLangDesc() {
+  sortBySourceLangDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceLang', Sort.desc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      sortByTargetLang() {
+  sortByTargetLang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetLang', Sort.asc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      sortByTargetLangDesc() {
+  sortByTargetLangDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetLang', Sort.desc);
     });
@@ -609,35 +807,49 @@ extension TranslatorSettingQuerySortThenBy
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      thenByIdDesc() {
+  thenByIdDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.desc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      thenBySourceLang() {
+  thenByJson() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'json', Sort.asc);
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
+  thenByJsonDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'json', Sort.desc);
+    });
+  }
+
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
+  thenBySourceLang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceLang', Sort.asc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      thenBySourceLangDesc() {
+  thenBySourceLangDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'sourceLang', Sort.desc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      thenByTargetLang() {
+  thenByTargetLang() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetLang', Sort.asc);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QAfterSortBy>
-      thenByTargetLangDesc() {
+  thenByTargetLangDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'targetLang', Sort.desc);
     });
@@ -646,15 +858,23 @@ extension TranslatorSettingQuerySortThenBy
 
 extension TranslatorSettingQueryWhereDistinct
     on QueryBuilder<TranslatorSetting, TranslatorSetting, QDistinct> {
+  QueryBuilder<TranslatorSetting, TranslatorSetting, QDistinct> distinctByJson({
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'json', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<TranslatorSetting, TranslatorSetting, QDistinct>
-      distinctBySourceLang({bool caseSensitive = true}) {
+  distinctBySourceLang({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'sourceLang', caseSensitive: caseSensitive);
     });
   }
 
   QueryBuilder<TranslatorSetting, TranslatorSetting, QDistinct>
-      distinctByTargetLang({bool caseSensitive = true}) {
+  distinctByTargetLang({bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'targetLang', caseSensitive: caseSensitive);
     });
@@ -669,15 +889,21 @@ extension TranslatorSettingQueryProperty
     });
   }
 
+  QueryBuilder<TranslatorSetting, String?, QQueryOperations> jsonProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'json');
+    });
+  }
+
   QueryBuilder<TranslatorSetting, String?, QQueryOperations>
-      sourceLangProperty() {
+  sourceLangProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'sourceLang');
     });
   }
 
   QueryBuilder<TranslatorSetting, String?, QQueryOperations>
-      targetLangProperty() {
+  targetLangProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'targetLang');
     });

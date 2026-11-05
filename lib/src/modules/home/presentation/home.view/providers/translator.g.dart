@@ -10,20 +10,20 @@ part of 'translator.dart';
 // ignore_for_file: type=lint, type=warning
 
 @ProviderFor(Translator)
-const translatorProvider = TranslatorProvider._();
+final translatorProvider = TranslatorProvider._();
 
 final class TranslatorProvider
     extends $AsyncNotifierProvider<Translator, TranslationSettingEntity?> {
-  const TranslatorProvider._()
-      : super(
-          from: null,
-          argument: null,
-          retry: null,
-          name: r'translatorProvider',
-          isAutoDispose: false,
-          dependencies: null,
-          $allTransitiveDependencies: null,
-        );
+  TranslatorProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'translatorProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
   @override
   String debugGetCreateSourceHash() => _$translatorHash();
@@ -39,16 +39,24 @@ abstract class _$Translator extends $AsyncNotifier<TranslationSettingEntity?> {
   FutureOr<TranslationSettingEntity?> build();
   @$mustCallSuper
   @override
-  void runBuild() {
-    final created = build();
-    final ref = this.ref as $Ref<AsyncValue<TranslationSettingEntity?>,
-        TranslationSettingEntity?>;
-    final element = ref.element as $ClassProviderElement<
-        AnyNotifier<AsyncValue<TranslationSettingEntity?>,
-            TranslationSettingEntity?>,
-        AsyncValue<TranslationSettingEntity?>,
-        Object?,
-        Object?>;
-    element.handleValue(ref, created);
+  WhenComplete runBuild() {
+    final ref =
+        this.ref
+            as $Ref<
+              AsyncValue<TranslationSettingEntity?>,
+              TranslationSettingEntity?
+            >;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<
+                AsyncValue<TranslationSettingEntity?>,
+                TranslationSettingEntity?
+              >,
+              AsyncValue<TranslationSettingEntity?>,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
   }
 }
