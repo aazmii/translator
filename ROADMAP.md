@@ -61,7 +61,7 @@ These are in the code, but haven't been tested on a device since the merge.
 
 ### Action panels
 
-- [ ] Use a copy icon on the source panel's copy button (it currently shows the paste icon)
+- [x] Use a copy icon on the source panel's copy button (it showed the paste icon; not yet checked on a device)
 - [ ] Decide whether bookmarking should be allowed before a translation exists
 
 ### Offline Languages screen
@@ -110,4 +110,5 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Decide whether to restore `flutter_lints`, which the merge removed from the project
 - [ ] Stop tracking `android/build/reports/problems/problems-report.html` in git
 - [ ] Remove the `MyApp2`, `InheritedNose` and `HelloWidget` experiments if they are no longer needed
+- [ ] Delete `meaning.display.widget.dart`: nothing uses its `TranslationDisplayWidget`
 - [ ] Keep the project and pub cache on the same drive if Kotlin builds stay slow
