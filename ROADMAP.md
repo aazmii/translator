@@ -8,59 +8,73 @@ Last updated: 2026-11-05
 
 ## Current status
 
-- Packages resolve, and `flutter analyze` reports 0 errors.
-- The debug APK builds.
-- Not yet checked: running the app on a device, and a release build.
+- `dev` includes merge commit `da0b2a6` and matches `origin/dev`.
+- `flutter analyze` reports 0 errors and 1 warning (the unused `nose` variable).
+- All 10 tests pass.
+- A release APK was built just before the merge commit.
+- Not yet checked: running the merged app on a device.
 
 ## Done
 
 ### Toolchain upgrade (2026-11-05)
 
-- [x] Fix the dependency conflict between the Isar and Riverpod generators
-- [x] Update `isar_community` and its generator to 3.4.1
+- [x] Fix the dependency conflict that stopped packages resolving
 - [x] Update `flutter_riverpod` to ^3.4.3, `riverpod_annotation` to ^4.0.7 and `riverpod_generator` to ^4.0.9
 - [x] Remove `custom_lint`, which conflicts with the analyzer version `riverpod_generator` needs
-- [x] Regenerate the `*.g.dart` files
 - [x] Update Gradle to 8.14, AGP to 8.11.1 and Kotlin to 2.2.20
 
-## Next up: verify the upgrade
+### Merged from `origin/dev` (2026-11-05)
+
+These are in the code, but haven't been tested on a device since the merge.
+
+- [x] Replace Isar with Hive for local storage
+- [x] Move to a clean-architecture structure, with tests for the dependency rules
+- [x] Bookmarks: save from the source panel, then view and delete them in a Bookmarks screen
+- [x] Share translations
+- [x] Voice input screen (online only for now, see Phase 3)
+- [x] App icon
+
+### Bugs fixed by the merge
+
+- [x] Close each translator after use, and stop creating one on every state change
+- [x] Swap languages instead of allowing the same source and target
+- [x] Use the correct speech language for the source and target panels
+- [x] Refresh the Offline Languages list after a download or delete
+- [x] Stop rows on the Offline Languages screen from changing the source language
+
+## Next up: verify the merge
 
 - [ ] Run the app on a device
-- [ ] Confirm the saved language choice survives the upgrade
-- [ ] Run a release build
-- [ ] Commit the upgrade
+- [ ] Test bookmarks, share, speech and language downloads
+- [ ] Confirm the app handles the move to Hive cleanly (there is no Isar migration, so saved settings and languages reset once)
 
 ## Phase 1: Bug fixes
 
 ### Translation
 
-- [ ] Handle translation errors and show a message instead of failing silently
-- [ ] Stop models downloading silently during translation, with no progress or Wi-Fi check
-- [ ] Reuse `OnDeviceTranslator` instead of creating one on every state change
-- [ ] Close translators when they are no longer needed
+- [ ] Handle errors in `translate()` and show a message instead of failing silently
+- [ ] Check that a language is downloaded before translating, because the plugin otherwise downloads it silently, with no progress or Wi-Fi check
 
 ### Languages
 
-- [ ] Fix `setTargetLanguage`, which compares against the target instead of the source
-- [ ] Prevent source and target from being the same language
-- [ ] Swap the text as well as the languages when the user presses swap
+- [ ] Swap the text as well as the languages, because the old text is currently translated as the wrong language
 
-### Speech
+### Action panels
 
-- [ ] Use the correct speech language for the source and target panels
+- [ ] Use a copy icon on the source panel's copy button (it currently shows the paste icon)
+- [ ] Decide whether bookmarking should be allowed before a translation exists
 
 ### Offline Languages screen
 
-- [ ] Refresh the list after a download or delete
 - [ ] Show progress while a language downloads
-- [ ] Stop rows on this screen from changing the source language and closing it
+- [ ] Show a message when a download or delete fails
 - [ ] Rename "Recent Languages", or add real recent-language tracking
 - [ ] Fix the section headers when no languages are downloaded
 - [ ] Resolve the performance TODO in `offline.languages.view.dart`
 
 ## Phase 2: Dependable offline use
 
-- [ ] First-run setup for choosing and downloading languages
+- [ ] First-run setup for choosing and downloading languages (`firstRun` is stored, but no setup screen uses it yet)
 - [ ] Show the model size before download (roughly 30 MB per language)
 - [ ] Add a Wi-Fi-only download option
 - [ ] Mark which languages are ready to use offline
@@ -69,13 +83,11 @@ Last updated: 2026-11-05
 ## Phase 3: Everyday features
 
 - [ ] Translation history
-- [ ] Favourites (connect the disabled bookmark buttons)
-- [ ] Share translations (connect the disabled share button)
 - [ ] Confirm when text is copied
 - [ ] "Translate" option in Android's text-selection menu
 - [ ] Accept text shared from other apps
-- [ ] Voice input (connect the mic button; offline support depends on the device's speech packs)
-- [ ] Check right-to-left display for Arabic, Hebrew and Urdu
+- [ ] Offline voice input (`onDevice` is currently `false`; offline support also depends on the device's speech packs)
+- [ ] Right-to-left display for Arabic, Hebrew and Urdu (the text fields don't set a direction yet)
 
 ## Phase 4: Standout features
 
@@ -95,6 +107,7 @@ Last updated: 2026-11-05
 ## Maintenance
 
 - [ ] Plan the upgrade to Gradle 9.1+ and AGP 9.0.1+, because Flutter will soon drop support for the current versions
+- [ ] Decide whether to restore `flutter_lints`, which the merge removed from the project
 - [ ] Stop tracking `android/build/reports/problems/problems-report.html` in git
 - [ ] Remove the `MyApp2`, `InheritedNose` and `HelloWidget` experiments if they are no longer needed
 - [ ] Keep the project and pub cache on the same drive if Kotlin builds stay slow
