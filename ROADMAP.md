@@ -58,7 +58,7 @@ These are in the code, but haven't been tested on a device since the merge.
 
 ### Languages
 
-- [x] Swap the text as well as the languages, because the old text was translated as the wrong language (with a translation, swap exchanges the texts and doesn't translate again; without one, it swaps languages only; not yet checked on a device)
+- [x] Swap the text as well as the languages, because the old text was translated as the wrong language (with a translation, swap exchanges the texts and doesn't translate again; without one, it swaps languages only, and the swap button then translates in the new direction; not yet checked on a device)
 
 ### Action panels
 
