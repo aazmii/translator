@@ -81,6 +81,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Add a Wi-Fi-only download option
 - [ ] Mark which languages are ready to use offline
 - [x] Offer a download when a selected language is missing (in the Translate From / To picker: asks, downloads over any connection behind a loader with Cancel, then selects it; not yet checked on a device)
+- [x] Offer a download when translating with a missing language (home screen: send, paste and swap ask to download, then translate; covers deleted languages, first-run defaults and older saved settings; prompt, download and translate confirmed working on a device 2026-11-17; paste, swap, offline Cancel and the keyboard not separately confirmed)
 
 ## Phase 3: Everyday features
 
