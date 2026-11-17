@@ -20,6 +20,7 @@ import '../../modules/languages/data/repositories/offline_language_repository_im
 import '../../modules/languages/domain/repositories/offline_language_repository.dart';
 import '../../modules/languages/domain/usecases/delete_language.dart';
 import '../../modules/languages/domain/usecases/download_language.dart';
+import '../../modules/languages/domain/usecases/get_language.dart';
 import '../../modules/languages/domain/usecases/get_offline_languages.dart';
 import '../../modules/setting/data/datasources/settings_local_data_source.dart';
 import '../../modules/setting/data/repositories/setting.repository.dart';
@@ -84,6 +85,9 @@ final languageModelDataSourceProvider = Provider<LanguageModelDataSource>(
 );
 final getOfflineLanguagesProvider = Provider<GetOfflineLanguages>(
   (ref) => GetOfflineLanguages(ref.watch(offlineLanguageRepositoryProvider)),
+);
+final getLanguageProvider = Provider<GetLanguage>(
+  (ref) => GetLanguage(ref.watch(offlineLanguageRepositoryProvider)),
 );
 final downloadLanguageProvider = Provider<DownloadLanguage>(
   (ref) => DownloadLanguage(ref.watch(offlineLanguageRepositoryProvider)),

@@ -4,6 +4,7 @@ import '../models/language_model.dart';
 
 abstract interface class LanguageModelDataSource {
   Future<List<LanguageModel>> getLanguages();
+  Future<LanguageModel?> getLanguage(String code);
   Future<bool> download(String code);
   Future<bool> delete(String code);
 }
@@ -24,6 +25,20 @@ final class MlKitLanguageModelDataSource implements LanguageModelDataSource {
           isDownloaded: await _modelManager.isModelDownloaded(language.bcpCode),
         );
       }),
+    );
+  }
+
+  @override
+  Future<LanguageModel?> getLanguage(String code) async {
+    final matches = TranslateLanguage.values.where(
+      (language) => language.bcpCode == code,
+    );
+    if (matches.isEmpty) return null;
+    final language = matches.first;
+    return LanguageModel(
+      name: language.name,
+      code: language.bcpCode,
+      isDownloaded: await _modelManager.isModelDownloaded(language.bcpCode),
     );
   }
 

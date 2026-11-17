@@ -5,6 +5,7 @@ import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
 import 'package:fluttertoast/fluttertoast.dart'
     show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/helpers/translation.toast.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 
@@ -102,7 +103,9 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               ref
                   .read(translatorProvider.notifier)
                   .setSourceText(widget.controller?.text ?? '');
-              await ref.read(translatorProvider.notifier).translate();
+              showTranslateOutcomeToast(
+                await ref.read(translatorProvider.notifier).translate(),
+              );
               if (context.mounted) FocusScope.of(context).unfocus();
             },
             icon: Icon(Icons.send),
@@ -117,7 +120,9 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               if (data != null && data.text != null) {
                 ref.read(translatorProvider.notifier).setSourceText(data.text!);
                 widget.controller?.text = data.text!;
-                await ref.read(translatorProvider.notifier).translate();
+                showTranslateOutcomeToast(
+                  await ref.read(translatorProvider.notifier).translate(),
+                );
               }
             },
             icon: Icon(Icons.paste),

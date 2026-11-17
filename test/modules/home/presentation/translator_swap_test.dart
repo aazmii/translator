@@ -5,6 +5,8 @@ import 'package:go_translator/src/modules/home/domain/entities/translation_setti
 import 'package:go_translator/src/modules/home/domain/repositories/translation_repository.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/providers/translator.dart';
 
+import '../../../helpers/fake_offline_language_repository.dart';
+
 void main() {
   late _FakeTranslationRepository repository;
   late ProviderContainer container;
@@ -12,7 +14,12 @@ void main() {
   setUp(() {
     repository = _FakeTranslationRepository();
     container = ProviderContainer(
-      overrides: [translationRepositoryProvider.overrideWithValue(repository)],
+      overrides: [
+        translationRepositoryProvider.overrideWithValue(repository),
+        offlineLanguageRepositoryProvider.overrideWithValue(
+          FakeOfflineLanguageRepository(),
+        ),
+      ],
     );
   });
 

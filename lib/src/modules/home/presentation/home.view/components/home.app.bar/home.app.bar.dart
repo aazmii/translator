@@ -6,6 +6,7 @@ import 'package:go_translator/src/modules/languages/domain/entities/language.dar
 import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
 import 'package:go_translator/src/modules/languages/presentation/view/offline.languages.view.dart';
 
+import '../../helpers/translation.toast.dart';
 import '../../providers/translator.dart';
 
 const _swapDuration = Duration(milliseconds: 300);
@@ -57,7 +58,9 @@ class _HomeAppbarState extends ConsumerState<HomeAppbar>
       _swapController.forward(from: 0);
     }
     await swap;
-    if (!hadTranslation) await translator.translate();
+    if (!hadTranslation) {
+      showTranslateOutcomeToast(await translator.translate());
+    }
   }
 
   @override
