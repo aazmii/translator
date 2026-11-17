@@ -149,6 +149,24 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
     return await loader ?? _DownloadResult.cancelled;
   }
 
+  /// One language row, with a section [header] above it when given.
+  Widget _languageTile(Language language, String? header) {
+    final tile = ListTile(
+      onTap: widget.selectionMode ? () => _onLanguageTapped(language) : null,
+      title: Text(language.name.capitalize),
+      trailing: _trailing(language),
+    );
+    if (header == null) return tile;
+    return Column(
+      mainAxisSize: .min,
+      crossAxisAlignment: .start,
+      children: [
+        Text(header, style: TextStyle(color: context.theme.colorScheme.primary)),
+        tile,
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO: optimize, it's causing spike
@@ -158,7 +176,6 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
         ?.where((l) => l.name.toLowerCase().contains(searchText!.toLowerCase()))
         .toList();
     // final languages = ref.watch(offlineLanguagesProvider).value;
-    final downloaded = languages?.where((l) => l.isDownloaded).toList();
     if (languages == null) return Center(child: CircularProgressIndicator());
 
     return Scaffold(
@@ -176,40 +193,18 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
           physics: BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
           itemCount: languages.length,
           itemBuilder: (context, i) {
+            // The list is downloaded-first, so each section starts at its
+            // first language. Decided per row, so a list with no downloaded
+            // languages (e.g. while searching) gets only "Other Languages".
             final language = languages[i];
-            if (i == 0) {
-              return Column(
-                mainAxisSize: .min,
-                crossAxisAlignment: .start,
-                children: [
-                  Text('Recent Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
-                  ListTile(
-                    onTap: widget.selectionMode ? () => _onLanguageTapped(language) : null,
-                    title: Text(language.name.capitalize),
-                    trailing: _trailing(language),
-                  ),
-                ],
-              );
+            final previous = i == 0 ? null : languages[i - 1];
+            final String? header;
+            if (language.isDownloaded) {
+              header = previous == null ? 'Downloaded' : null;
+            } else {
+              header = previous == null || previous.isDownloaded ? 'Other Languages' : null;
             }
-            if (i == downloaded!.length) {
-              return Column(
-                mainAxisSize: .min,
-                crossAxisAlignment: .start,
-                children: [
-                  Text('Other Languages', style: TextStyle(color: context.theme.colorScheme.primary)),
-                  ListTile(
-                    onTap: widget.selectionMode ? () => _onLanguageTapped(language) : null,
-                    title: Text(language.name.capitalize),
-                    trailing: _trailing(language),
-                  ),
-                ],
-              );
-            }
-            return ListTile(
-              onTap: widget.selectionMode ? () => _onLanguageTapped(language) : null,
-              title: Text(language.name.capitalize),
-              trailing: _trailing(language),
-            );
+            return _languageTile(language, header);
           },
         ),
       ),

@@ -172,6 +172,55 @@ void main() {
     expect(find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.delete)), findsOneWidget);
   });
 
+  group('section headers', () {
+    Future<void> search(WidgetTester tester, String text) async {
+      await tester.tap(find.byIcon(Icons.search));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField), text);
+      await tester.pumpAndSettle();
+    }
+
+    /// The text of each header, top to bottom, with the language under it.
+    List<String> headersWithFirstLanguage(WidgetTester tester) {
+      return tester.widgetList<Column>(find.byType(Column)).where((column) {
+        return column.children.length == 2 && column.children.first is Text && column.children.last is ListTile;
+      }).map((column) {
+        final header = (column.children.first as Text).data!;
+        final language = ((column.children.last as ListTile).title as Text).data!;
+        return '$header: $language';
+      }).toList();
+    }
+
+    testWidgets('full list: Downloaded above English, Other Languages above Afrikaans', (tester) async {
+      await openPicker(tester);
+
+      expect(headersWithFirstLanguage(tester), ['Downloaded: English', 'Other Languages: Afrikaans']);
+      expect(find.text('Recent Languages'), findsNothing);
+    });
+
+    testWidgets('search with only missing languages shows only Other Languages', (tester) async {
+      await openPicker(tester);
+      await search(tester, 'afr');
+
+      expect(headersWithFirstLanguage(tester), ['Other Languages: Afrikaans']);
+    });
+
+    testWidgets('search with only downloaded languages shows only Downloaded', (tester) async {
+      await openPicker(tester);
+      await search(tester, 'fre');
+
+      expect(headersWithFirstLanguage(tester), ['Downloaded: French']);
+    });
+
+    testWidgets('search with no matches shows no headers', (tester) async {
+      await openPicker(tester);
+      await search(tester, 'zzz');
+
+      expect(headersWithFirstLanguage(tester), isEmpty);
+      expect(find.byType(ListTile), findsNothing);
+    });
+  });
+
   Future<void> tapDownloadIcon(WidgetTester tester) async {
     await tester.tap(find.byIcon(Icons.download));
     await tester.pump();
