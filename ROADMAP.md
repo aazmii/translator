@@ -52,9 +52,9 @@ These are in the code, but haven't been tested on a device since the merge.
 
 ### Translation
 
-- [ ] Handle errors in `translate()` and show a message instead of failing silently
+- [x] Handle errors in `translate()` and show a message instead of failing silently (shows a toast and clears the old translation; not yet checked on a device)
+- [x] Check that a language is downloaded before translating (2026-11-17). Otherwise the plugin calls `downloadModelIfNeeded()` first: online it downloads silently over any connection, offline it never returns. Missing models now show a toast pointing to Offline Languages; not yet checked on a device
 - [ ] Stop `translate()` overwriting state changes made while it waits (it applies the result to the state it read before the call, so a swap or edit during translation is lost)
-- [ ] Check that a language is downloaded before translating, because the plugin otherwise downloads it silently, with no progress or Wi-Fi check
 
 ### Languages
 
@@ -71,6 +71,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Show a message when a download or delete fails
 - [ ] Rename "Recent Languages", or add real recent-language tracking
 - [ ] Fix the section headers when no languages are downloaded
+- [ ] Hide the delete button for English (built into ML Kit; first check what deleting it actually does)
 - [ ] Resolve the performance TODO in `offline.languages.view.dart`
 
 ## Phase 2: Dependable offline use
