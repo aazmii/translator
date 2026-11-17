@@ -68,7 +68,8 @@ These are in the code, but haven't been tested on a device since the merge.
 ### Offline Languages screen
 
 - [x] Show progress while a language downloads (a spinner with Cancel, from both the row and the download icon, over any connection; ML Kit reports no real progress; not yet checked on a device)
-- [ ] Show a message when a download or delete fails
+- [x] Show a message when a download or delete fails (toasts for both; not yet checked on a device)
+- [x] Confirm before deleting a language, and say so when it's the selected source or target (it stays selected; translating later offers the download; not yet checked on a device)
 - [x] Rename "Recent Languages", or add real recent-language tracking (renamed to "Downloaded", which is what the section lists)
 - [x] Fix the section headers when no languages are downloaded (most visible when searching, e.g. "afr" showed Afrikaans under the first header; headers are now decided per row; not yet checked on a device)
 - [x] Hide the delete button for English (built into ML Kit; tapping it did nothing on a device, 2026-11-17). Hidden by the code `en`, not by anything ML Kit reports; not yet checked on a device
