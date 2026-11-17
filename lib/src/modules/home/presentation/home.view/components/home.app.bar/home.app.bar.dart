@@ -90,9 +90,11 @@ class _HomeAppbarState extends ConsumerState<HomeAppbar>
                       onTap: () async {
                         final code = await fadePush<String>(
                           context,
-                          const OfflineLanguagesView(
+                          OfflineLanguagesView(
                             title: 'Translate From',
                             selectionMode: true,
+                            sourceLanguageCode: sourceCode,
+                            targetLanguageCode: targetCode,
                           ),
                         );
                         if (code != null) {
@@ -130,9 +132,11 @@ class _HomeAppbarState extends ConsumerState<HomeAppbar>
                       onTap: () async {
                         final code = await fadePush<String>(
                           context,
-                          const OfflineLanguagesView(
+                          OfflineLanguagesView(
                             title: 'Translate To',
                             selectionMode: true,
+                            sourceLanguageCode: sourceCode,
+                            targetLanguageCode: targetCode,
                           ),
                         );
                         if (code != null) {

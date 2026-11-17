@@ -35,7 +35,10 @@ void main() {
 
   /// Opens the picker from a host screen. `result` gives what the picker
   /// returned once it closed; `isOpen` is true while it's open.
-  Future<({bool Function() isOpen, String? Function() result})> openPicker(WidgetTester tester) async {
+  Future<({bool Function() isOpen, String? Function() result})> openPicker(
+    WidgetTester tester, {
+    String? targetLanguageCode,
+  }) async {
     String? picked;
     var open = false;
     await tester.pumpWidget(
@@ -49,7 +52,12 @@ void main() {
                 picked = await Navigator.push<String>(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const OfflineLanguagesView(title: 'Translate To', selectionMode: true),
+                    builder: (_) => OfflineLanguagesView(
+                      title: 'Translate To',
+                      selectionMode: true,
+                      sourceLanguageCode: 'en',
+                      targetLanguageCode: targetLanguageCode,
+                    ),
                   ),
                 );
                 open = false;
@@ -170,6 +178,68 @@ void main() {
         find.descendant(of: find.widgetWithText(ListTile, name), matching: find.byType(IconButton));
     expect(buttonIn('English'), findsNothing);
     expect(find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.delete)), findsOneWidget);
+  });
+
+  group('delete', () {
+    Finder trashIn(String name) =>
+        find.descendant(of: find.widgetWithText(ListTile, name), matching: find.byIcon(Icons.delete));
+
+    testWidgets('asks first; Cancel deletes nothing', (tester) async {
+      await openPicker(tester);
+
+      await tester.tap(trashIn('French'));
+      await tester.pumpAndSettle();
+      expect(find.text('Delete French?'), findsOneWidget);
+      expect(find.text("You'll need to download it again to use it."), findsOneWidget);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+      expect(languages.deletes, isEmpty);
+      expect(trashIn('French'), findsOneWidget);
+    });
+
+    testWidgets('Delete deletes, and the row offers a download again', (tester) async {
+      final picker = await openPicker(tester);
+
+      await tester.tap(trashIn('French'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(languages.deletes, ['fr']);
+      expect(trashIn('French'), findsNothing);
+      expect(
+        find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.download)),
+        findsOneWidget,
+      );
+      expect(picker.isOpen(), isTrue);
+    });
+
+    testWidgets('mentions it when the language is selected', (tester) async {
+      await openPicker(tester, targetLanguageCode: 'fr');
+
+      await tester.tap(trashIn('French'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text("French is your current target language. You'll need to download it again to use it."),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('a failed delete shows a message', (tester) async {
+      languages.failDeletes = true;
+      await openPicker(tester);
+
+      await tester.tap(trashIn('French'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+
+      expect(toasts, ["Couldn't delete French. Please try again."]);
+      expect(trashIn('French'), findsOneWidget);
+      await tester.pump(_toastTimer);
+    });
   });
 
   group('section headers', () {

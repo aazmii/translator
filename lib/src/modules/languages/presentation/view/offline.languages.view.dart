@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/core/extensions/extensions.dart';
 import 'package:go_translator/src/modules/languages/domain/entities/language.dart';
 import 'package:go_translator/src/modules/languages/presentation/components/expandabe.search.app.bar.dart';
@@ -7,10 +8,21 @@ import 'package:go_translator/src/modules/languages/presentation/components/lang
 import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
 
 class OfflineLanguagesView extends ConsumerStatefulWidget {
-  const OfflineLanguagesView({super.key, required this.title, this.selectionMode = false});
+  const OfflineLanguagesView({
+    super.key,
+    required this.title,
+    this.selectionMode = false,
+    this.sourceLanguageCode,
+    this.targetLanguageCode,
+  });
 
   final String title;
   final bool selectionMode;
+
+  /// The languages selected on the home screen, so deleting one can say so.
+  /// Passed in rather than read here, so this module doesn't depend on home.
+  final String? sourceLanguageCode;
+  final String? targetLanguageCode;
 
   @override
   ConsumerState<OfflineLanguagesView> createState() => _OfflineLanguagesViewState();
@@ -57,13 +69,61 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
   /// Trailing icon: deletes a downloaded language, or downloads a missing one
   /// behind the loader without asking. Never selects the language.
   Future<void> _onTrailingTapped(Language language) async {
-    final notifier = ref.read(offlineLanguagesProvider.notifier);
     if (language.isDownloaded) {
-      notifier.deleteLanguage(language.code);
+      await _confirmAndDelete(language);
       return;
     }
     final result = await downloadLanguagesWithLoader(context, ref, [language]);
     if (mounted && result == LanguageDownloadResult.failed) showLanguageDownloadFailed([language]);
+  }
+
+  /// Asks before deleting, mentioning it when the language is selected. A
+  /// selected language stays selected; translating later offers the download.
+  Future<void> _confirmAndDelete(Language language) async {
+    final name = language.name.capitalize;
+    final role = language.code == widget.targetLanguageCode
+        ? 'target'
+        : language.code == widget.sourceLanguageCode
+        ? 'source'
+        : null;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Delete $name?'),
+        content: Text(
+          [
+            if (role != null) '$name is your current $role language.',
+            "You'll need to download it again to use it.",
+          ].join(' '),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Delete')),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    bool deleted;
+    try {
+      deleted = await ref.read(offlineLanguagesProvider.notifier).deleteLanguage(language.code);
+    } catch (error, stackTrace) {
+      debugPrint('Delete of ${language.code} failed: $error\n$stackTrace');
+      deleted = false;
+    }
+    if (!deleted) _showToast("Couldn't delete $name. Please try again.");
+  }
+
+  void _showToast(String message) {
+    Fluttertoast.showToast(
+      msg: message,
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.black87,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
   }
 
   /// One language row, with a section [header] above it when given.

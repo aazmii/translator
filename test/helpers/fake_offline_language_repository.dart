@@ -37,6 +37,16 @@ final class FakeOfflineLanguageRepository implements OfflineLanguageRepository {
     return ok;
   }
 
+  /// The code of each delete call, in order.
+  final List<String> deletes = [];
+
+  /// When true, deletes report failure and change nothing.
+  bool failDeletes = false;
+
   @override
-  Future<bool> deleteLanguage(String code) async => notDownloaded.add(code);
+  Future<bool> deleteLanguage(String code) async {
+    deletes.add(code);
+    if (failDeletes) return false;
+    return notDownloaded.add(code);
+  }
 }
