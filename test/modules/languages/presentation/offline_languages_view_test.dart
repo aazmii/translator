@@ -163,14 +163,63 @@ void main() {
     expect(toasts, isEmpty);
   });
 
-  testWidgets('the trailing icon still downloads Wi-Fi only, without asking', (tester) async {
+  testWidgets('English has no delete button; other downloaded languages do', (tester) async {
+    await openPicker(tester);
+
+    Finder buttonIn(String name) =>
+        find.descendant(of: find.widgetWithText(ListTile, name), matching: find.byType(IconButton));
+    expect(buttonIn('English'), findsNothing);
+    expect(find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.delete)), findsOneWidget);
+  });
+
+  Future<void> tapDownloadIcon(WidgetTester tester) async {
+    await tester.tap(find.byIcon(Icons.download));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+  }
+
+  testWidgets('the download icon shows the loader without asking, then stays on the list', (tester) async {
+    languages.pendingDownload = Completer<bool>();
     final picker = await openPicker(tester);
 
-    await tester.tap(find.byIcon(Icons.download));
+    await tapDownloadIcon(tester);
+    expect(find.text('Download Afrikaans?'), findsNothing);
+    expect(find.text('Downloading Afrikaans…'), findsOneWidget);
+
+    languages.pendingDownload!.complete(true);
     await tester.pumpAndSettle();
 
-    expect(find.text('Download Afrikaans?'), findsNothing);
-    expect(languages.downloads.single, (code: 'af', wifiOnly: true));
+    expect(find.text('Downloading Afrikaans…'), findsNothing);
     expect(picker.isOpen(), isTrue);
+    expect(picker.result(), isNull);
+    expect(languages.downloads.single, (code: 'af', wifiOnly: false));
+    expect(find.byIcon(Icons.download), findsNothing); // Afrikaans now shows delete
+  });
+
+  testWidgets('a failed download from the icon shows a message', (tester) async {
+    languages.pendingDownload = Completer<bool>();
+    final picker = await openPicker(tester);
+    await tapDownloadIcon(tester);
+
+    languages.pendingDownload!.complete(false);
+    await tester.pumpAndSettle();
+
+    expect(picker.isOpen(), isTrue);
+    expect(toasts, ["Couldn't download Afrikaans. Check your connection and try again."]);
+    await tester.pump(_toastTimer);
+  });
+
+  testWidgets('cancel in the icon loader stays on the list', (tester) async {
+    languages.pendingDownload = Completer<bool>();
+    final picker = await openPicker(tester);
+    await tapDownloadIcon(tester);
+
+    await tester.tap(find.text('Cancel'));
+    await tester.pumpAndSettle();
+    languages.pendingDownload!.complete(true);
+    await tester.pumpAndSettle();
+
+    expect(picker.isOpen(), isTrue);
+    expect(toasts, isEmpty);
   });
 }
