@@ -4,6 +4,7 @@ import 'package:go_translator/src/config/di/providers.dart';
 import 'package:go_translator/src/core/usecase/usecase.dart';
 import 'package:go_translator/src/modules/home/domain/entities/translation_settings.dart';
 import 'package:go_translator/src/modules/home/domain/usecases/translate_text.dart';
+import 'package:go_translator/src/modules/languages/domain/entities/language.dart';
 
 final translatorProvider = AsyncNotifierProvider<Translator, TranslatorState>(
   Translator.new,
@@ -21,10 +22,10 @@ final class TranslateSucceeded extends TranslateOutcome {
 
 /// One or both language models aren't downloaded, so ML Kit wasn't called.
 final class TranslateLanguagesMissing extends TranslateOutcome {
-  const TranslateLanguagesMissing(this.languageNames);
+  const TranslateLanguagesMissing(this.languages);
 
-  /// Names as ML Kit gives them (lower case), source first.
-  final List<String> languageNames;
+  /// The languages without a model, source first.
+  final List<Language> languages;
 }
 
 /// ML Kit or the model check threw. The raw error is logged.
@@ -138,7 +139,7 @@ final class Translator extends AsyncNotifier<TranslatorState> {
     }
     try {
       final getLanguage = ref.read(getLanguageProvider);
-      final missing = <String>[];
+      final missing = <Language>[];
       for (final code in [
         current.sourceLanguageCode,
         current.targetLanguageCode,
@@ -147,7 +148,7 @@ final class Translator extends AsyncNotifier<TranslatorState> {
         if (language == null) {
           throw StateError('Unknown language code: $code');
         }
-        if (!language.isDownloaded) missing.add(language.name);
+        if (!language.isDownloaded) missing.add(language);
       }
       if (missing.isNotEmpty) {
         final latest = _latestIfUnchanged(current);

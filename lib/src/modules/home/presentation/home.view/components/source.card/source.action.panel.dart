@@ -5,7 +5,7 @@ import 'package:flutter_tts/flutter_tts.dart' show FlutterTts;
 import 'package:fluttertoast/fluttertoast.dart'
     show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
-import 'package:go_translator/src/modules/home/presentation/home.view/helpers/translation.toast.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/helpers/translate.with.download.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 
@@ -103,9 +103,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               ref
                   .read(translatorProvider.notifier)
                   .setSourceText(widget.controller?.text ?? '');
-              showTranslateOutcomeToast(
-                await ref.read(translatorProvider.notifier).translate(),
-              );
+              await translateOrOfferDownload(context, ref);
               if (context.mounted) FocusScope.of(context).unfocus();
             },
             icon: Icon(Icons.send),
@@ -120,9 +118,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
               if (data != null && data.text != null) {
                 ref.read(translatorProvider.notifier).setSourceText(data.text!);
                 widget.controller?.text = data.text!;
-                showTranslateOutcomeToast(
-                  await ref.read(translatorProvider.notifier).translate(),
-                );
+                if (context.mounted) await translateOrOfferDownload(context, ref);
               }
             },
             icon: Icon(Icons.paste),

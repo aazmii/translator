@@ -75,7 +75,7 @@ void main() {
     final outcome = await translator.translate();
 
     expect(outcome, isA<TranslateLanguagesMissing>());
-    expect((outcome as TranslateLanguagesMissing).languageNames, ['french']);
+    expect((outcome as TranslateLanguagesMissing).languages.map((l) => l.name), ['french']);
     expect(repository.translateCalls, callsBefore);
     expect(container.read(translatorProvider).value!.translatedText, isNull);
   });
@@ -87,7 +87,7 @@ void main() {
 
     final outcome = await translator.translate();
 
-    expect((outcome as TranslateLanguagesMissing).languageNames, ['english']);
+    expect((outcome as TranslateLanguagesMissing).languages.map((l) => l.name), ['english']);
     expect(repository.translateCalls, 0);
   });
 
@@ -98,7 +98,7 @@ void main() {
 
     final outcome = await translator.translate();
 
-    expect((outcome as TranslateLanguagesMissing).languageNames, ['english', 'french']);
+    expect((outcome as TranslateLanguagesMissing).languages.map((l) => l.name), ['english', 'french']);
     expect(repository.translateCalls, 0);
   });
 }

@@ -11,8 +11,8 @@ import '../providers/translator.dart';
 void showTranslateOutcomeToast(TranslateOutcome outcome) {
   final message = switch (outcome) {
     TranslateSucceeded() || TranslateSuperseded() => null,
-    TranslateLanguagesMissing(:final languageNames) => _missingMessage(
-      languageNames.map((name) => name.capitalize).toList(),
+    TranslateLanguagesMissing(:final languages) => _missingMessage(
+      languages.map((language) => language.name.capitalize).toList(),
     ),
     TranslateFailed() => "Couldn't translate this text. Please try again.",
   };
