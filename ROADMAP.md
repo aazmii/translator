@@ -63,7 +63,7 @@ These are in the code, but haven't been tested on a device since the merge.
 ### Action panels
 
 - [x] Use a copy icon on the source panel's copy button (it showed the paste icon; not yet checked on a device)
-- [ ] Decide whether bookmarking should be allowed before a translation exists
+- [x] Decide whether bookmarking should be allowed before a translation exists (decided 2026-11-17: keep as is; a bookmark can be saved without a translation)
 
 ### Offline Languages screen
 
