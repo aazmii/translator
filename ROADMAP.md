@@ -80,7 +80,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Show the model size before download (roughly 30 MB per language)
 - [ ] Add a Wi-Fi-only download option
 - [ ] Mark which languages are ready to use offline
-- [ ] Offer a download when a selected language is missing
+- [x] Offer a download when a selected language is missing (in the Translate From / To picker: asks, downloads over any connection behind a loader with Cancel, then selects it; not yet checked on a device)
 
 ## Phase 3: Everyday features
 
