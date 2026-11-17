@@ -90,6 +90,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Confirm when text is copied
 - [ ] "Translate" option in Android's text-selection menu
 - [ ] Accept text shared from other apps
+- [x] Voice input as a draft dialog (2026-11-17): nothing is written to the source box until Insert; Try again discards the last phrase and waits for the mic; the mic adds phrases; readable errors; Insert appends and translates; the language is matched to a device speech locale. Not yet checked on a device
 - [ ] Offline voice input (`onDevice` is currently `false`; offline support also depends on the device's speech packs)
 - [ ] Right-to-left display for Arabic, Hebrew and Urdu (the text fields don't set a direction yet)
 
