@@ -68,10 +68,21 @@ final class Translator extends AsyncNotifier<TranslatorState> {
   Future<void> swapLanguage() async {
     final current = value;
     if (current == null) return;
-    final updated = current.copyWith(
-      sourceLanguageCode: current.targetLanguageCode,
-      targetLanguageCode: current.sourceLanguageCode,
-    );
+    final translated = current.translatedText;
+    final hasTranslation = translated != null && translated.isNotEmpty;
+    // With a translation, exchange the texts too so each stays with its
+    // language. Without one, keep the source text and swap languages only.
+    final updated = hasTranslation
+        ? current.copyWith(
+            sourceLanguageCode: current.targetLanguageCode,
+            targetLanguageCode: current.sourceLanguageCode,
+            sourceText: translated,
+            translatedText: current.sourceText,
+          )
+        : current.copyWith(
+            sourceLanguageCode: current.targetLanguageCode,
+            targetLanguageCode: current.sourceLanguageCode,
+          );
     state = AsyncData(updated);
     await _saveLanguageSettings(updated);
   }

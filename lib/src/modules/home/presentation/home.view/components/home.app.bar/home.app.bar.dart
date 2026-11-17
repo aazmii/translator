@@ -46,8 +46,7 @@ class HomeAppbar extends ConsumerWidget implements PreferredSizeWidget {
             IconButton(
               onPressed: () async {
                 FocusScope.of(context).unfocus();
-                ref.read(translatorProvider.notifier).swapLanguage();
-                await ref.read(translatorProvider.notifier).translate();
+                await ref.read(translatorProvider.notifier).swapLanguage();
               },
               icon: const Icon(Icons.swap_horiz),
             ),

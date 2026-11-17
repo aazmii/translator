@@ -39,6 +39,16 @@ class _SourceCardState extends ConsumerState<SourceCard> {
 
   @override
   Widget build(BuildContext context) {
+    // The text field owns its text, so push state changes made elsewhere
+    // (such as a language swap) back into it.
+    ref.listen(translatorProvider.select((s) => s.value?.sourceText), (_, next) {
+      final text = next ?? '';
+      if (text == sourceController.text) return;
+      sourceController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    });
     return Card(
       child: Row(
         crossAxisAlignment: .start,
