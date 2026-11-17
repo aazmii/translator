@@ -8,6 +8,7 @@ import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookm
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/translate.with.download.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.recognizer.dart';
 
 import '../../providers/translator.dart';
 
@@ -124,21 +125,22 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             icon: Icon(Icons.paste),
           ),
           IconButton(
-            onPressed: () {
-              showDialog<void>(
+            onPressed: () async {
+              // The dialog only returns text on Insert; nothing is written
+              // here while speaking.
+              final spoken = await showDialog<String>(
                 context: context,
-                builder: (_) => SpeechListeningDialog(
-                  initialText: widget.controller?.text,
-                  localeId: sourceLanguageCode,
-                  onTextChanged: (value) {
-                    widget.controller?.text = value;
-                    widget.controller?.selection = TextSelection.fromPosition(
-                      TextPosition(offset: value.length),
-                    );
-                    ref.read(translatorProvider.notifier).setSourceText(value);
-                  },
-                ),
+                barrierDismissible: false,
+                builder: (_) => SpeechListeningDialog(languageCode: sourceLanguageCode),
               );
+              if (spoken == null || spoken.trim().isEmpty || !context.mounted) return;
+              final text = appendDictation(widget.controller?.text ?? '', spoken);
+              widget.controller?.value = TextEditingValue(
+                text: text,
+                selection: TextSelection.collapsed(offset: text.length),
+              );
+              ref.read(translatorProvider.notifier).setSourceText(text);
+              await translateOrOfferDownload(context, ref);
             },
             icon: Icon(Icons.mic),
           ),
