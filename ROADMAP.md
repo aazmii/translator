@@ -53,11 +53,12 @@ These are in the code, but haven't been tested on a device since the merge.
 ### Translation
 
 - [ ] Handle errors in `translate()` and show a message instead of failing silently
+- [ ] Stop `translate()` overwriting state changes made while it waits (it applies the result to the state it read before the call, so a swap or edit during translation is lost)
 - [ ] Check that a language is downloaded before translating, because the plugin otherwise downloads it silently, with no progress or Wi-Fi check
 
 ### Languages
 
-- [ ] Swap the text as well as the languages, because the old text is currently translated as the wrong language
+- [x] Swap the text as well as the languages, because the old text was translated as the wrong language (with a translation, swap exchanges the texts and doesn't translate again; without one, it swaps languages only; not yet checked on a device)
 
 ### Action panels
 
