@@ -5,7 +5,7 @@ import '../models/language_model.dart';
 abstract interface class LanguageModelDataSource {
   Future<List<LanguageModel>> getLanguages();
   Future<LanguageModel?> getLanguage(String code);
-  Future<bool> download(String code);
+  Future<bool> download(String code, {bool wifiOnly = true});
   Future<bool> delete(String code);
 }
 
@@ -43,7 +43,8 @@ final class MlKitLanguageModelDataSource implements LanguageModelDataSource {
   }
 
   @override
-  Future<bool> download(String code) => _modelManager.downloadModel(code);
+  Future<bool> download(String code, {bool wifiOnly = true}) =>
+      _modelManager.downloadModel(code, isWifiRequired: wifiOnly);
 
   @override
   Future<bool> delete(String code) => _modelManager.deleteModel(code);

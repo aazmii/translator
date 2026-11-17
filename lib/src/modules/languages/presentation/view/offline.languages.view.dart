@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart'
+    show Fluttertoast, Toast, ToastGravity;
 import 'package:go_translator/src/core/extensions/extensions.dart';
+import 'package:go_translator/src/modules/languages/domain/entities/language.dart';
 import 'package:go_translator/src/modules/languages/presentation/components/expandabe.search.app.bar.dart';
 import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
 
@@ -19,8 +22,121 @@ class OfflineLanguagesView extends ConsumerStatefulWidget {
       _OfflineLanguagesViewState();
 }
 
+enum _DownloadResult { done, failed, cancelled }
+
 class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
   String? searchText = '';
+
+  /// Selection mode: returns a downloaded language straight away. A missing
+  /// one is offered for download first, and returned once it's downloaded.
+  Future<void> _onLanguageTapped(Language language) async {
+    if (language.isDownloaded) {
+      Navigator.pop(context, language.code);
+      return;
+    }
+    final name = language.name.capitalize;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Download $name?'),
+        content: Text(
+          '$name needs to be downloaded before you can use it. '
+          'This may use mobile data.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Download'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    final result = await _downloadWithLoader(language.code, name);
+    if (!mounted) return;
+    switch (result) {
+      case _DownloadResult.done:
+        Navigator.pop(context, language.code);
+      case _DownloadResult.failed:
+        Fluttertoast.showToast(
+          msg: "Couldn't download $name. Check your connection and try again.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      case _DownloadResult.cancelled:
+        break;
+    }
+  }
+
+  /// Downloads over any connection behind a loader that only its Cancel
+  /// button can close. ML Kit can't cancel a download, so after Cancel it may
+  /// still finish in the background; [loaderOpen] stops that late result from
+  /// popping a second route.
+  Future<_DownloadResult> _downloadWithLoader(String code, String name) async {
+    final navigator = Navigator.of(context, rootNavigator: true);
+    var loaderOpen = true;
+    void close(_DownloadResult result) {
+      if (!loaderOpen) return;
+      loaderOpen = false;
+      navigator.pop(result);
+    }
+
+    final loader = showDialog<_DownloadResult>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          content: Row(
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(width: 24),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Downloading $name…'),
+                    const SizedBox(height: 4),
+                    Text(
+                      'This can take a minute.',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => close(_DownloadResult.cancelled),
+              child: const Text('Cancel'),
+            ),
+          ],
+        ),
+      ),
+    );
+    ref
+        .read(offlineLanguagesProvider.notifier)
+        .downloadLanguage(code, wifiOnly: false)
+        .then(
+          (ok) => close(ok ? _DownloadResult.done : _DownloadResult.failed),
+          onError: (Object error, StackTrace stackTrace) {
+            debugPrint('Download of $code failed: $error\n$stackTrace');
+            close(_DownloadResult.failed);
+          },
+        );
+    return await loader ?? _DownloadResult.cancelled;
+  }
   @override
   Widget build(BuildContext context) {
     // TODO: optimize, it's causing spike
@@ -62,7 +178,7 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
                   ),
                   ListTile(
                     onTap: widget.selectionMode
-                        ? () => Navigator.pop(context, language.code)
+                        ? () => _onLanguageTapped(language)
                         : null,
                     title: Text(language.name.capitalize),
                     trailing: IconButton(
@@ -96,7 +212,7 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
                   ),
                   ListTile(
                     onTap: widget.selectionMode
-                        ? () => Navigator.pop(context, language.code)
+                        ? () => _onLanguageTapped(language)
                         : null,
                     title: Text(language.name.capitalize),
                     trailing: IconButton(
@@ -121,7 +237,7 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
             }
             return ListTile(
               onTap: widget.selectionMode
-                  ? () => Navigator.pop(context, language.code)
+                  ? () => _onLanguageTapped(language)
                   : null,
               title: Text(language.name.capitalize),
               trailing: IconButton(

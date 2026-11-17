@@ -18,7 +18,8 @@ final class OfflineLanguageRepositoryImpl implements OfflineLanguageRepository {
       (await _dataSource.getLanguage(code))?.toEntity();
 
   @override
-  Future<bool> downloadLanguage(String code) => _dataSource.download(code);
+  Future<bool> downloadLanguage(String code, {bool wifiOnly = true}) =>
+      _dataSource.download(code, wifiOnly: wifiOnly);
 
   @override
   Future<bool> deleteLanguage(String code) => _dataSource.delete(code);

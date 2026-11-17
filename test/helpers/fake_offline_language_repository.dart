@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:go_translator/src/modules/languages/domain/entities/language.dart';
 import 'package:go_translator/src/modules/languages/domain/repositories/offline_language_repository.dart';
 
@@ -20,8 +22,20 @@ final class FakeOfflineLanguageRepository implements OfflineLanguageRepository {
     for (final code in _names.keys) (await getLanguage(code))!,
   ];
 
+  /// The arguments of each download call, in order.
+  final List<({String code, bool wifiOnly})> downloads = [];
+
+  /// When set, downloads wait for this instead of finishing at once. Complete
+  /// it with true to mark the language downloaded, false to fail.
+  Completer<bool>? pendingDownload;
+
   @override
-  Future<bool> downloadLanguage(String code) async => notDownloaded.remove(code);
+  Future<bool> downloadLanguage(String code, {bool wifiOnly = true}) async {
+    downloads.add((code: code, wifiOnly: wifiOnly));
+    final ok = await (pendingDownload?.future ?? Future.value(true));
+    if (ok) notDownloaded.remove(code);
+    return ok;
+  }
 
   @override
   Future<bool> deleteLanguage(String code) async => notDownloaded.add(code);
