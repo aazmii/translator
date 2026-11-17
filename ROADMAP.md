@@ -54,7 +54,7 @@ These are in the code, but haven't been tested on a device since the merge.
 
 - [x] Handle errors in `translate()` and show a message instead of failing silently (shows a toast and clears the old translation; not yet checked on a device)
 - [x] Check that a language is downloaded before translating (2026-11-17). Otherwise the plugin calls `downloadModelIfNeeded()` first: online it downloads silently over any connection, offline it never returns. Missing models now show a toast pointing to Offline Languages; not yet checked on a device
-- [ ] Stop `translate()` overwriting state changes made while it waits (it applies the result to the state it read before the call, so a swap or edit during translation is lost)
+- [x] Stop `translate()` overwriting state changes made while it waits (if the text or a language changed meanwhile, the outcome is now dropped silently; covered by tests, hard to trigger by hand)
 
 ### Languages
 
