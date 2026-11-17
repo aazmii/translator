@@ -5,11 +5,12 @@ import 'package:go_translator/src/core/extensions/extensions.dart';
 
 import '../providers/translator.dart';
 
-/// Tells the user why a translation didn't happen. Shows nothing on success.
+/// Tells the user why a translation didn't happen. Shows nothing on success,
+/// or when the result was dropped because the text or languages changed.
 /// Raw errors are logged by `Translator.translate()`.
 void showTranslateOutcomeToast(TranslateOutcome outcome) {
   final message = switch (outcome) {
-    TranslateSucceeded() => null,
+    TranslateSucceeded() || TranslateSuperseded() => null,
     TranslateLanguagesMissing(:final languageNames) => _missingMessage(
       languageNames.map((name) => name.capitalize).toList(),
     ),

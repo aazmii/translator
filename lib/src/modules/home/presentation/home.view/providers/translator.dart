@@ -32,6 +32,12 @@ final class TranslateFailed extends TranslateOutcome {
   const TranslateFailed();
 }
 
+/// The source text or a language changed while translating, so the outcome
+/// was dropped and the state left as it was.
+final class TranslateSuperseded extends TranslateOutcome {
+  const TranslateSuperseded();
+}
+
 final class TranslatorState {
   const TranslatorState({
     required this.sourceLanguageCode,
@@ -121,6 +127,10 @@ final class Translator extends AsyncNotifier<TranslatorState> {
   /// models are downloaded: with a model missing it would wait for a download
   /// (forever when offline). On any outcome but success the old translation
   /// is cleared.
+  ///
+  /// If the source text or either language changes while this waits, the
+  /// outcome no longer matches what's on screen: the state is left alone and
+  /// [TranslateSuperseded] is returned.
   Future<TranslateOutcome> translate() async {
     final current = value;
     if (current == null || current.sourceText?.trim().isEmpty != false) {
@@ -140,7 +150,9 @@ final class Translator extends AsyncNotifier<TranslatorState> {
         if (!language.isDownloaded) missing.add(language.name);
       }
       if (missing.isNotEmpty) {
-        _clearTranslation();
+        final latest = _latestIfUnchanged(current);
+        if (latest == null) return const TranslateSuperseded();
+        state = AsyncData(latest.copyWith(translatedText: null));
         return TranslateLanguagesMissing(missing);
       }
 
@@ -151,22 +163,29 @@ final class Translator extends AsyncNotifier<TranslatorState> {
           text: current.sourceText!,
         ),
       );
-      state = AsyncData(current.copyWith(translatedText: translatedText));
+      final latest = _latestIfUnchanged(current);
+      if (latest == null) return const TranslateSuperseded();
+      state = AsyncData(latest.copyWith(translatedText: translatedText));
       return const TranslateSucceeded();
     } catch (error, stackTrace) {
       debugPrint('translate() failed: $error\n$stackTrace');
-      _clearTranslation();
+      final latest = _latestIfUnchanged(current);
+      if (latest == null) return const TranslateSuperseded();
+      state = AsyncData(latest.copyWith(translatedText: null));
       return const TranslateFailed();
     }
   }
 
-  /// Clears from the latest state, so it can't undo a change made while
-  /// translate() was waiting.
-  void _clearTranslation() {
+  /// The latest state if its source text and languages still match [started],
+  /// otherwise null.
+  TranslatorState? _latestIfUnchanged(TranslatorState started) {
     final latest = value;
-    if (latest != null) {
-      state = AsyncData(latest.copyWith(translatedText: null));
-    }
+    if (latest == null) return null;
+    final unchanged =
+        latest.sourceText == started.sourceText &&
+        latest.sourceLanguageCode == started.sourceLanguageCode &&
+        latest.targetLanguageCode == started.targetLanguageCode;
+    return unchanged ? latest : null;
   }
 
   Future<void> setSourceLanguage(String code) async {
