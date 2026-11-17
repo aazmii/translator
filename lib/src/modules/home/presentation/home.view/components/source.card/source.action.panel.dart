@@ -41,7 +41,7 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
             icon: Icon(Icons.close),
           ),
           IconButton(
-            icon: Icon(Icons.paste),
+            icon: Icon(Icons.copy),
             onPressed: () => Clipboard.setData(ClipboardData(text: sourceText)),
           ),
           IconButton(
