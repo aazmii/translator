@@ -67,11 +67,11 @@ These are in the code, but haven't been tested on a device since the merge.
 
 ### Offline Languages screen
 
-- [ ] Show progress while a language downloads
+- [x] Show progress while a language downloads (a spinner with Cancel, from both the row and the download icon, over any connection; ML Kit reports no real progress; not yet checked on a device)
 - [ ] Show a message when a download or delete fails
 - [ ] Rename "Recent Languages", or add real recent-language tracking
 - [ ] Fix the section headers when no languages are downloaded
-- [ ] Hide the delete button for English (built into ML Kit; first check what deleting it actually does)
+- [x] Hide the delete button for English (built into ML Kit; tapping it did nothing on a device, 2026-11-17). Hidden by the code `en`, not by anything ML Kit reports; not yet checked on a device
 - [ ] Resolve the performance TODO in `offline.languages.view.dart`
 
 ## Phase 2: Dependable offline use
