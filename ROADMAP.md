@@ -99,6 +99,13 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Offline voice input (`onDevice` is currently `false`; offline support also depends on the device's speech packs)
 - [ ] Right-to-left display for Arabic, Hebrew and Urdu (the text fields don't set a direction yet)
 
+## Design: Teal Meridian (from Stitch, `design/DESIGN.md` and `design/DESIGN_DARK.md`)
+
+- [x] Step 1, theme (2026-11-18): light colours from the token list in `DESIGN.md`; dark surfaces, outlines and error colours from `DESIGN_DARK.md`, with accents generated from the light teal `#00796B`. Inter 4.1 bundled (400/500/600/700, about 1.7 MB) with the design's type scale; cards 16px, dialogs 24px, drawer 28px, pill buttons and chips. Not yet checked on a device
+  - Decisions (2026-11-18): the dark file's cyan primary is replaced by the light teal so both modes share one hue; the same type and shapes in both modes (the dark file's Space Grotesk and 8px buttons are not used); where a design file's prose and token list disagree, the token list wins.
+- [ ] Step 2: source and translation cards, and the language bar
+- [ ] Step 3: lists, download badges and the drawer
+
 ## Phase 4: Standout features
 
 - [ ] Camera translation (ML Kit text recognition doesn't support every script, including Arabic)
@@ -111,6 +118,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Replace the `com.example.translator` package name
 - [ ] Add a release signing key
 - [ ] Check ML Kit's attribution requirements
+- [ ] Show the Inter font licence (SIL OFL, `assets/fonts/Inter-LICENSE.txt`) in the app's licences page
 - [ ] Tell users that on-device translation is less accurate than cloud services
 - [ ] Replace the default app description in `pubspec.yaml`
 
