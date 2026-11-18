@@ -348,7 +348,7 @@ class _OfflineLanguagesViewState extends ConsumerState<OfflineLanguagesView> {
                 ],
                 if (available.isNotEmpty) ...[
                   _sectionHeader(
-                    'Available for Download',
+                    'Available',
                     available.length,
                     widget.selectionMode ? 'Tap to download and use' : 'Tap to save offline',
                   ),
