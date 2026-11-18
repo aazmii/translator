@@ -9,6 +9,10 @@ import 'package:go_translator/src/modules/languages/presentation/providers/offli
 import '../../helpers/language.name.dart';
 import '../card.surface.dart';
 
+/// The translation card. Plain and laid out like the source card (same
+/// surface, padding, 40px top row, text field and toolbar height); its top
+/// row holds the target language's name (decision 2026-11-19: no glow,
+/// badge or styled text).
 class TargetCard extends ConsumerStatefulWidget {
   const TargetCard({super.key});
 
@@ -33,52 +37,27 @@ class _TargetCardState extends ConsumerState<TargetCard> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final scheme = theme.colorScheme;
     final translation = ref.watch(translatorProvider).value;
     targetController.text = translation?.translatedText ?? '';
     final languages = ref.watch(offlineLanguagesProvider).value ?? const <Language>[];
     final name = languageName(languages, translation?.targetLanguageCode);
 
     return CardSurface(
-      color: scheme.surfaceContainerLow,
+      color: theme.colorScheme.surfaceContainerLowest,
       child: Column(
         children: [
-          // Header: target language and an on-device badge (every translation
-          // runs on the phone).
+          // Same height as the source card's Clear row, so the cards line up.
           SizedBox(
             height: 40,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      name.toUpperCase(),
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: scheme.primary,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 1.1,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: ShapeDecoration(shape: const StadiumBorder(), color: scheme.secondaryContainer),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.offline_pin, size: 12, color: scheme.onSecondaryContainer),
-                        const SizedBox(width: 2),
-                        Text(
-                          'On-device',
-                          style: theme.textTheme.labelSmall?.copyWith(color: scheme.onSecondaryContainer),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  name,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onSurface),
+                ),
               ),
             ),
           ),

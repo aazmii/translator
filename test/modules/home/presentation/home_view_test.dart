@@ -129,10 +129,12 @@ void main() {
     );
   });
 
-  testWidgets('the translation card shows the target language and On-device', (tester) async {
+  testWidgets('the translation card shows the target language plainly (no badge)', (tester) async {
     await pumpHome(tester);
-    expect(find.text('FRENCH'), findsOneWidget);
-    expect(find.text('On-device'), findsOneWidget);
+    // Once in the language bar's target pill, once on top of the card.
+    expect(find.text('French'), findsNWidgets(2));
+    expect(find.text('FRENCH'), findsNothing);
+    expect(find.text('On-device'), findsNothing);
   });
 
   testWidgets('empty source: the card shows only the field; only the mic works', (tester) async {
