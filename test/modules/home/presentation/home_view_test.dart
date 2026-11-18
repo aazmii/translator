@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_translator/src/config/di/providers.dart';
+import 'package:go_translator/src/modules/bookmarks/domain/entities/bookmark.entity.dart';
+import 'package:go_translator/src/modules/bookmarks/domain/repositories/bookmarks_repository.dart';
 import 'package:go_translator/src/modules/home/domain/entities/translation_settings.dart';
 import 'package:go_translator/src/modules/home/domain/repositories/translation_repository.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/home.view.dart';
@@ -11,6 +13,7 @@ import 'package:go_translator/src/modules/setting/domain/entities/setting.entity
 import 'package:go_translator/src/modules/setting/domain/repositories/setting.repo.dart';
 import 'package:go_translator/src/theme/themes/dark/dark.theme.dart';
 import 'package:go_translator/src/theme/themes/light/light.theme.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../helpers/fake_offline_language_repository.dart';
 
@@ -28,6 +31,7 @@ Future<void> _loadInter() async {
 
 void main() {
   late ProviderContainer container;
+  late _FakeBookmarksRepository bookmarks;
 
   setUpAll(_loadInter);
 
@@ -54,6 +58,7 @@ void main() {
         offlineLanguageRepositoryProvider.overrideWithValue(FakeOfflineLanguageRepository()),
         // Keyboard off so the page renders without focus side effects.
         settingsRepositoryProvider.overrideWithValue(_FakeSettingsRepository()),
+        bookmarksRepositoryProvider.overrideWithValue(bookmarks = _FakeBookmarksRepository()),
       ],
     );
     await tester.pumpWidget(
@@ -179,6 +184,120 @@ void main() {
       findsOneWidget,
     );
   });
+
+  // Decision 2026-11-19: only the translator page has the drawer, so it has
+  // no Translate tile.
+  testWidgets('the drawer has no Translate tile; its destinations open on top', (tester) async {
+    PackageInfo.setMockInitialValues(
+      appName: 'Go Translator',
+      packageName: 'com.example.translator',
+      version: '1.0.0',
+      buildNumber: '1',
+      buildSignature: '',
+    );
+    await pumpHome(tester);
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+
+    final drawer = find.byType(Drawer);
+    expect(find.descendant(of: drawer, matching: find.text('Translate')), findsNothing);
+    expect(find.descendant(of: drawer, matching: find.text('Offline Languages')), findsOneWidget);
+    expect(find.descendant(of: drawer, matching: find.text('Bookmarks')), findsOneWidget);
+    expect(find.descendant(of: drawer, matching: find.text('Settings')), findsOneWidget);
+    expect(find.descendant(of: drawer, matching: find.text('3 installed')), findsOneWidget);
+    expect(find.descendant(of: drawer, matching: find.text('0 saved')), findsOneWidget);
+    expect(find.descendant(of: drawer, matching: find.text('Version 1.0.0')), findsOneWidget);
+
+    await tester.tap(find.descendant(of: drawer, matching: find.text('Settings')));
+    await tester.pumpAndSettle();
+    expect(find.byType(Drawer), findsNothing);
+    await tester.tap(find.byTooltip('Back'));
+    await tester.pumpAndSettle();
+    expect(find.byType(HomeView), findsOneWidget);
+  });
+
+  group('Bookmark saves the translation with the languages it was made in', () {
+    Future<void> translateHello(WidgetTester tester) async {
+      await pumpHome(tester);
+      await tester.enterText(find.byType(EditableText).first, 'hello');
+      await tester.pumpAndSettle(); // Translate is enabled from the next frame.
+      await tester.tap(find.text('Translate'));
+      await tester.pumpAndSettle();
+      expect(state().translatedText, 'translated');
+    }
+
+    // The "Bookmarked" toast starts a 1 s timer in Fluttertoast; let it run
+    // out so it doesn't outlive the test.
+    Future<void> tapBookmark(WidgetTester tester) async {
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.star_outline));
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 2));
+    }
+
+    testWidgets('right after translating', (tester) async {
+      await translateHello(tester);
+      await tapBookmark(tester);
+
+      final saved = bookmarks.saved.single;
+      expect(saved.sourceText, 'hello');
+      expect(saved.targetText, 'translated');
+      expect(saved.sourceLanguageCode, 'en');
+      expect(saved.targetLanguageCode, 'fr');
+      expect(saved.savedAt, isNotNull);
+    });
+
+    testWidgets("after picking another target language, keeps the translation's languages", (tester) async {
+      await translateHello(tester);
+      await container.read(translatorProvider.notifier).setTargetLanguage('af');
+      await tester.pumpAndSettle();
+      await tapBookmark(tester);
+
+      expect(bookmarks.saved.single.targetText, 'translated');
+      expect(bookmarks.saved.single.targetLanguageCode, 'fr');
+    });
+
+    testWidgets('after editing the text, saves the text alone', (tester) async {
+      await translateHello(tester);
+      await tester.enterText(find.byType(EditableText).first, 'hello there');
+      await tester.pumpAndSettle();
+      await tapBookmark(tester);
+
+      final saved = bookmarks.saved.single;
+      expect(saved.sourceText, 'hello there');
+      expect(saved.targetText, isNull);
+      expect(saved.sourceLanguageCode, 'en');
+      expect(saved.targetLanguageCode, isNull);
+    });
+
+    testWidgets('before translating, saves the text in the selected source language', (tester) async {
+      await pumpHome(tester);
+      await container.read(translatorProvider.notifier).setSourceLanguage('af');
+      await tester.enterText(find.byType(EditableText).first, 'hallo');
+      await tester.pumpAndSettle();
+      await tapBookmark(tester);
+
+      expect(bookmarks.saved.single.sourceLanguageCode, 'af');
+      expect(bookmarks.saved.single.targetText, isNull);
+    });
+  });
+}
+
+final class _FakeBookmarksRepository implements BookmarksRepository {
+  final saved = <BookmarkEntity>[];
+
+  @override
+  Future<List<BookmarkEntity>> getBookmarks() async => saved;
+
+  @override
+  Future<bool> containsSourceText(String sourceText) async => saved.any((b) => b.sourceText == sourceText);
+
+  @override
+  Future<void> save(BookmarkEntity bookmark) async => saved.add(bookmark);
+
+  @override
+  Future<void> remove(String id) async => saved.removeWhere((b) => b.id == id);
 }
 
 const _icons = {

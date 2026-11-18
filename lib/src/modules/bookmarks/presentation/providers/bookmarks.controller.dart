@@ -21,9 +21,16 @@ final class BookmarksController extends AsyncNotifier<List<BookmarkEntity>> {
   Future<bool> saveBookmark({
     required String sourceText,
     String? targetText,
+    String? sourceLanguageCode,
+    String? targetLanguageCode,
   }) async {
     final saved = await ref.read(saveBookmarkProvider)(
-      SaveBookmarkParams(sourceText: sourceText, targetText: targetText),
+      SaveBookmarkParams(
+        sourceText: sourceText,
+        targetText: targetText,
+        sourceLanguageCode: sourceLanguageCode,
+        targetLanguageCode: targetLanguageCode,
+      ),
     );
     if (saved) await refresh();
     return saved;
@@ -31,6 +38,12 @@ final class BookmarksController extends AsyncNotifier<List<BookmarkEntity>> {
 
   Future<void> removeBookmark(String id) async {
     await ref.read(removeBookmarkProvider)(id);
+    await refresh();
+  }
+
+  /// Puts a deleted [bookmark] back as it was (Undo).
+  Future<void> restoreBookmark(BookmarkEntity bookmark) async {
+    await ref.read(restoreBookmarkProvider)(bookmark);
     await refresh();
   }
 }

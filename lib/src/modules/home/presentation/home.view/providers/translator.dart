@@ -39,12 +39,28 @@ final class TranslateSuperseded extends TranslateOutcome {
   const TranslateSuperseded();
 }
 
+/// What the current translation was made from. Typing or picking another
+/// language afterwards doesn't redo the translation, so the selected
+/// languages and source text can differ from these.
+final class TranslationOrigin {
+  const TranslationOrigin({
+    required this.sourceText,
+    required this.sourceLanguageCode,
+    required this.targetLanguageCode,
+  });
+
+  final String sourceText;
+  final String sourceLanguageCode;
+  final String targetLanguageCode;
+}
+
 final class TranslatorState {
   const TranslatorState({
     required this.sourceLanguageCode,
     required this.targetLanguageCode,
     this.sourceText,
     this.translatedText,
+    this.translationOrigin,
   });
 
   final String sourceLanguageCode;
@@ -52,14 +68,28 @@ final class TranslatorState {
   final String? sourceText;
   final String? translatedText;
 
+  /// Set together with [translatedText]; null when there is no translation.
+  final TranslationOrigin? translationOrigin;
+
   static const _notProvided = Object();
 
+  /// Changing [translatedText] without passing [translationOrigin] clears the
+  /// origin, so a translation never keeps another translation's origin.
   TranslatorState copyWith({
     String? sourceLanguageCode,
     String? targetLanguageCode,
     Object? sourceText = _notProvided,
     Object? translatedText = _notProvided,
+    Object? translationOrigin = _notProvided,
   }) {
+    final TranslationOrigin? origin;
+    if (translationOrigin != _notProvided) {
+      origin = translationOrigin as TranslationOrigin?;
+    } else if (translatedText != _notProvided) {
+      origin = null;
+    } else {
+      origin = this.translationOrigin;
+    }
     return TranslatorState(
       sourceLanguageCode: sourceLanguageCode ?? this.sourceLanguageCode,
       targetLanguageCode: targetLanguageCode ?? this.targetLanguageCode,
@@ -69,6 +99,7 @@ final class TranslatorState {
       translatedText: translatedText == _notProvided
           ? this.translatedText
           : translatedText as String?,
+      translationOrigin: origin,
     );
   }
 }
@@ -109,6 +140,13 @@ final class Translator extends AsyncNotifier<TranslatorState> {
             targetLanguageCode: current.sourceLanguageCode,
             sourceText: translated,
             translatedText: current.sourceText,
+            // The swapped pair is still a matching translation, the other
+            // way round.
+            translationOrigin: TranslationOrigin(
+              sourceText: translated,
+              sourceLanguageCode: current.targetLanguageCode,
+              targetLanguageCode: current.sourceLanguageCode,
+            ),
           )
         : current.copyWith(
             sourceLanguageCode: current.targetLanguageCode,
@@ -166,7 +204,16 @@ final class Translator extends AsyncNotifier<TranslatorState> {
       );
       final latest = _latestIfUnchanged(current);
       if (latest == null) return const TranslateSuperseded();
-      state = AsyncData(latest.copyWith(translatedText: translatedText));
+      state = AsyncData(
+        latest.copyWith(
+          translatedText: translatedText,
+          translationOrigin: TranslationOrigin(
+            sourceText: current.sourceText!,
+            sourceLanguageCode: current.sourceLanguageCode,
+            targetLanguageCode: current.targetLanguageCode,
+          ),
+        ),
+      );
       return const TranslateSucceeded();
     } catch (error, stackTrace) {
       debugPrint('translate() failed: $error\n$stackTrace');

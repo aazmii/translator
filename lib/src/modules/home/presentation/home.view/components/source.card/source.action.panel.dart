@@ -141,13 +141,27 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
 
   /// Saves the source text (and the translation, if any) as a bookmark.
   /// Works before translating (decision 2026-11-17).
+  ///
+  /// The translation is saved only if it was made from the text now in the
+  /// box, with the languages it was made in (the selection may have changed
+  /// since). Otherwise the text is saved alone, in the selected source
+  /// language.
   Future<void> _bookmark(TranslatorState? translation) async {
     final source = translation?.sourceText?.trim();
-    if (source == null || source.isEmpty) return;
+    if (translation == null || source == null || source.isEmpty) return;
+    final origin = translation.translationOrigin;
+    final translated = translation.translatedText;
+    final matches =
+        origin != null && translated != null && translated.isNotEmpty && origin.sourceText.trim() == source;
     try {
       final saved = await ref
           .read(bookmarksControllerProvider.notifier)
-          .saveBookmark(sourceText: source, targetText: translation?.translatedText);
+          .saveBookmark(
+            sourceText: source,
+            targetText: matches ? translated : null,
+            sourceLanguageCode: matches ? origin.sourceLanguageCode : translation.sourceLanguageCode,
+            targetLanguageCode: matches ? origin.targetLanguageCode : null,
+          );
       _toast(saved ? 'Bookmarked' : 'Already bookmarked', centre: !saved);
     } catch (error) {
       debugPrint('Bookmark failed: $error');

@@ -10,13 +10,7 @@ import 'package:go_translator/src/modules/setting/domain/repositories/setting.re
 import 'package:go_translator/src/modules/setting/presentation/view/setting_view.dart';
 import 'package:go_translator/src/theme/themes/dark/dark.theme.dart';
 import 'package:go_translator/src/theme/themes/light/light.theme.dart';
-import 'package:go_translator/src/modules/bookmarks/domain/entities/bookmark.entity.dart';
-import 'package:go_translator/src/modules/bookmarks/domain/repositories/bookmarks_repository.dart';
-import 'package:go_translator/src/modules/home/domain/entities/translation_settings.dart';
-import 'package:go_translator/src/modules/home/domain/repositories/translation_repository.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import '../../../helpers/fake_offline_language_repository.dart';
 
 void main() {
   late _FakeSettingsRepository repository;
@@ -290,15 +284,11 @@ void main() {
     expect(SettingsModel.fromJson('{"firstRun":false,"theme":"dark"}').theme, ThemeProfile.dark);
   });
 
-  testWidgets('the drawer on Settings highlights Settings; Translate goes back to the first page', (tester) async {
+  // Decision 2026-11-19: Settings has a back arrow, not the drawer.
+  testWidgets('Settings has a back arrow and no drawer; Back returns to the first page', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          settingsRepositoryProvider.overrideWithValue(_FakeSettingsRepository(const AppSettings())),
-          translationRepositoryProvider.overrideWithValue(_FakeTranslationRepository()),
-          offlineLanguageRepositoryProvider.overrideWithValue(FakeOfflineLanguageRepository()),
-          bookmarksRepositoryProvider.overrideWithValue(_FakeBookmarksRepository()),
-        ],
+        overrides: [settingsRepositoryProvider.overrideWithValue(_FakeSettingsRepository(const AppSettings()))],
         // Stands in for the translator page, with Settings pushed on top.
         child: MaterialApp(
           theme: lightTheme,
@@ -316,54 +306,14 @@ void main() {
     await tester.tap(find.text('first page'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.byTooltip('Open navigation menu'));
-    await tester.pumpAndSettle();
-    expect(tester.takeException(), isNull);
+    expect(find.byTooltip('Open navigation menu'), findsNothing);
+    expect(find.byType(Drawer), findsNothing);
 
-    final drawer = find.byType(Drawer);
-    // The highlighted tile is the one with the arrow; it must be Settings.
-    final highlighted = find.ancestor(of: find.byIcon(Icons.arrow_forward_ios), matching: find.byType(InkWell));
-    expect(find.descendant(of: highlighted, matching: find.text('Settings')), findsOneWidget);
-    expect(find.descendant(of: highlighted, matching: find.text('Translate')), findsNothing);
-    // Real counts in the badges: the fake has 3 downloaded languages, 0 bookmarks.
-    expect(find.descendant(of: drawer, matching: find.text('3 installed')), findsOneWidget);
-    expect(find.descendant(of: drawer, matching: find.text('0 saved')), findsOneWidget);
-
-    await tester.tap(find.descendant(of: drawer, matching: find.text('Translate')));
+    await tester.tap(find.byTooltip('Back'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingView), findsNothing);
     expect(find.text('first page'), findsOneWidget);
   });
-}
-
-final class _FakeTranslationRepository implements TranslationRepository {
-  @override
-  Future<TranslationSettings?> getSettings() async =>
-      const TranslationSettings(sourceLanguageCode: 'en', targetLanguageCode: 'fr');
-
-  @override
-  Future<void> saveSettings(TranslationSettings settings) async {}
-
-  @override
-  Future<String> translate({
-    required String sourceLanguageCode,
-    required String targetLanguageCode,
-    required String text,
-  }) async => 'translated';
-}
-
-final class _FakeBookmarksRepository implements BookmarksRepository {
-  @override
-  Future<List<BookmarkEntity>> getBookmarks() async => const [];
-
-  @override
-  Future<bool> containsSourceText(String sourceText) async => false;
-
-  @override
-  Future<void> save(BookmarkEntity bookmark) async {}
-
-  @override
-  Future<void> remove(String id) async {}
 }
 
 final class _FakeSettingsRepository implements SettingsRepository {

@@ -5,8 +5,6 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../../../theme/model/theme.model.dart' show ThemeProfileExtension;
 import '../../../../theme/provider/theme.provider.dart';
-import '../../../home/presentation/home.view/components/home.app.bar/home.app.bar.dart';
-import '../../../home/presentation/home.view/components/home.drawer/home.drawer.dart';
 import '../../../home/presentation/home.view/providers/translator.dart';
 import '../../domain/entities/setting.entity.dart';
 import '../../domain/entities/theme_profile.dart';
@@ -26,10 +24,7 @@ class SettingView extends ConsumerWidget {
     final showKeyboard = settings?.showKeyboardAtStartup ?? true;
     final textSize = settings?.textSize ?? AppSettings.defaultTextSize;
     return Scaffold(
-      // Same app bar and drawer as the translator page; the menu replaces the
-      // back arrow (Android Back still returns).
-      appBar: const HomeAppbar(title: 'Settings'),
-      drawer: const HomeDrawer(current: DrawerPage.settings),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [

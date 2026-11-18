@@ -16,20 +16,12 @@ final _appVersionProvider = FutureProvider<String>(
   (ref) async => (await PackageInfo.fromPlatform()).version,
 );
 
-/// The pages that have the drawer.
-enum DrawerPage { translate, settings }
-
-/// The navigation drawer (Teal Meridian, from Stitch's drawer screen), on the
-/// translator page and on Settings. [current] is the highlighted tile.
-///
-/// From the translator page, destinations are pushed on top of it. From
-/// Settings, Translate goes back to the translator page, and Offline
-/// Languages / Bookmarks replace Settings, so Back from them returns to the
-/// translator page.
+/// The translator page's navigation drawer (Teal Meridian, from Stitch's
+/// drawer screen). Only the translator page has it, so there is no Translate
+/// tile; each destination opens on top of the translator page, and Back
+/// returns to it (decision 2026-11-19).
 class HomeDrawer extends ConsumerWidget {
-  const HomeDrawer({super.key, this.current = DrawerPage.translate});
-
-  final DrawerPage current;
+  const HomeDrawer({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,19 +36,8 @@ class HomeDrawer extends ConsumerWidget {
     // Close the drawer first, so it isn't still open on return.
     void open(Widget page) {
       close();
-      if (current == DrawerPage.translate) {
-        fadePush(context, page);
-      } else {
-        fadeReplace(context, page);
-      }
+      fadePush(context, page);
     }
-
-    void openTranslate() {
-      close();
-      if (current != DrawerPage.translate) Navigator.popUntil(context, (route) => route.isFirst);
-    }
-
-    void openSettings() => current == DrawerPage.settings ? close() : open(const SettingView());
 
     return Drawer(
       child: SafeArea(
@@ -71,14 +52,6 @@ class HomeDrawer extends ConsumerWidget {
                   children: [
                     _Header(onClose: close),
                     const _DrawerDivider(),
-                    _NavTile(
-                      icon: Icons.translate,
-                      label: 'Translate',
-                      subtitle: 'Real-time instant text',
-                      selected: current == DrawerPage.translate,
-                      onTap: openTranslate,
-                    ),
-                    const SizedBox(height: 4),
                     _NavTile(
                       icon: Icons.download_for_offline_outlined,
                       label: 'Offline Languages',
@@ -104,9 +77,8 @@ class HomeDrawer extends ConsumerWidget {
                       icon: Icons.settings_outlined,
                       label: 'Settings',
                       subtitle: 'Theme, Keyboard, Text size',
-                      selected: current == DrawerPage.settings,
                       showChevron: true,
-                      onTap: openSettings,
+                      onTap: () => open(const SettingView()),
                     ),
                     const _DrawerDivider(),
                     const _PrivacyCard(),
@@ -179,7 +151,7 @@ class _DrawerDivider extends StatelessWidget {
 }
 
 /// A pill-shaped destination: icon, label, optional subtitle, and on the
-/// right a count badge or a chevron (an arrow when [selected]).
+/// right a count badge or a chevron.
 class _NavTile extends StatelessWidget {
   const _NavTile({
     required this.icon,
@@ -188,7 +160,6 @@ class _NavTile extends StatelessWidget {
     this.subtitle,
     this.badge,
     this.badgeHighlighted = false,
-    this.selected = false,
     this.showChevron = false,
   });
 
@@ -197,7 +168,6 @@ class _NavTile extends StatelessWidget {
   final String? subtitle;
   final String? badge;
   final bool badgeHighlighted;
-  final bool selected;
   final bool showChevron;
   final VoidCallback onTap;
 
@@ -205,12 +175,10 @@ class _NavTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
-    final foreground = selected ? colors.onPrimaryContainer : colors.onSurfaceVariant;
+    final foreground = colors.onSurfaceVariant;
 
     Widget? trailing;
-    if (selected) {
-      trailing = Icon(Icons.arrow_forward_ios, size: 16, color: foreground);
-    } else if (badge != null) {
+    if (badge != null) {
       trailing = Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: ShapeDecoration(shape: const StadiumBorder(), color: colors.surfaceContainerHigh),
@@ -227,7 +195,7 @@ class _NavTile extends StatelessWidget {
     }
 
     return Material(
-      color: selected ? colors.primaryContainer : Colors.transparent,
+      color: Colors.transparent,
       shape: const StadiumBorder(),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -238,7 +206,7 @@ class _NavTile extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
             child: Row(
               children: [
-                Icon(icon, size: 22, color: foreground, fill: selected ? 1 : 0),
+                Icon(icon, size: 22, color: foreground),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -248,10 +216,7 @@ class _NavTile extends StatelessWidget {
                       Text(
                         label,
                         overflow: TextOverflow.ellipsis,
-                        style: text.labelLarge?.copyWith(
-                          color: selected ? foreground : colors.onSurface,
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                        ),
+                        style: text.labelLarge?.copyWith(color: colors.onSurface, fontWeight: FontWeight.w500),
                       ),
                       if (subtitle != null)
                         Text(

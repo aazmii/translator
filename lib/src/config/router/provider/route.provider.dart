@@ -15,12 +15,3 @@ Future<T?> fadePush<T>(
   Duration duration = const Duration(milliseconds: 150),
 }) =>
     Navigator.push<T>(context, _fadeRoute<T>(page, duration));
-
-/// Like [fadePush], but [page] replaces the current page, so Back from it
-/// returns to the page underneath.
-Future<T?> fadeReplace<T>(
-  BuildContext context,
-  Widget page, {
-  Duration duration = const Duration(milliseconds: 150),
-}) =>
-    Navigator.pushReplacement<T, void>(context, _fadeRoute<T>(page, duration));

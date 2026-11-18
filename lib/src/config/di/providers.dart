@@ -7,6 +7,7 @@ import '../../modules/bookmarks/data/repositories/bookmarks.repository.impl.dart
 import '../../modules/bookmarks/domain/repositories/bookmarks_repository.dart';
 import '../../modules/bookmarks/domain/usecases/get_bookmarks.dart';
 import '../../modules/bookmarks/domain/usecases/remove_bookmark.dart';
+import '../../modules/bookmarks/domain/usecases/restore_bookmark.dart';
 import '../../modules/bookmarks/domain/usecases/save_bookmark.dart';
 import '../../modules/home/data/datasources/translation_local_data_source.dart';
 import '../../modules/home/data/datasources/translation_service_data_source.dart';
@@ -50,6 +51,9 @@ final saveBookmarkProvider = Provider<SaveBookmark>(
 );
 final removeBookmarkProvider = Provider<RemoveBookmark>(
   (ref) => RemoveBookmark(ref.watch(bookmarksRepositoryProvider)),
+);
+final restoreBookmarkProvider = Provider<RestoreBookmark>(
+  (ref) => RestoreBookmark(ref.watch(bookmarksRepositoryProvider)),
 );
 
 final translationLocalDataSourceProvider = Provider<TranslationLocalDataSource>(
