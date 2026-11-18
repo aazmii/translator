@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../../setting/presentation/providers/settings_provider.dart';
 import '../../providers/translator.dart';
+import '../card.surface.dart';
 import '../custom.textfield.dart';
 import 'source.action.panel.dart';
 
@@ -60,16 +61,25 @@ class _SourceCardState extends ConsumerState<SourceCard> {
         selection: TextSelection.collapsed(offset: text.length),
       );
     });
-    return Card(
-      child: Row(
-        crossAxisAlignment: .start,
+    final sourceText = ref.watch(translatorProvider.select((s) => s.value?.sourceText)) ?? '';
+    return CardSurface(
+      color: Theme.of(context).colorScheme.surfaceContainerLowest,
+      child: Column(
         children: [
+          // Keeps its height when hidden so the text doesn't jump.
+          SizedBox(
+            height: 40,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: sourceText.isEmpty ? null : SourceClearButton(controller: sourceController),
+            ),
+          ),
+          // The card holds only the text: nothing is drawn over an empty field.
           Expanded(
             child: CustomTextField(
               focusNode: _focusNode,
               controller: sourceController,
-              hintText: 'Text..',
-              // onChanged: ref.read(translatorProvider.notifier).setSourceText,
+              contentPadding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
             ),
           ),
           SourceActionPanel(controller: sourceController),

@@ -17,7 +17,9 @@ class CustomTextField extends ConsumerWidget {
     this.autofocus = false,
     this.focusNode,
     this.hintText,
+    this.contentPadding = const EdgeInsets.fromLTRB(8, 18, 0, 0),
   });
+  final EdgeInsetsGeometry contentPadding;
   // final String? initialValue;
   final bool? readOnly, showLoader;
   // final ValueChanged<String>? onChanged;
@@ -40,9 +42,7 @@ class CustomTextField extends ConsumerWidget {
             expands: true,
             maxLines: null,
             textAlignVertical: TextAlignVertical.top,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),
-            ),
+            decoration: InputDecoration(contentPadding: contentPadding, hintText: hintText),
           ),
           if (showLoader!) const Center(child: CircularProgressIndicator())
         ],

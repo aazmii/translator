@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'components/home.app.bar/home.app.bar.dart';
 import 'components/home.drawer/home.drawer.dart' show HomeDrawer;
+import 'components/language.bar/language.bar.dart';
 import 'components/source.card/souce.card.dart';
 import 'components/target.card/target.card.dart';
 
@@ -14,14 +15,20 @@ class HomeView extends StatelessWidget {
       appBar: HomeAppbar(),
       drawer: HomeDrawer(),
       resizeToAvoidBottomInset: false,
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Expanded(child: SourceCard()),
-            SizedBox(height: 8),
-            Expanded(child: TargetCard()),
-          ],
+      body: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
+          child: Column(
+            children: [
+              LanguageBar(),
+              SizedBox(height: 12),
+              // The two cards share the rest of the screen 50/50.
+              Expanded(child: SourceCard()),
+              SizedBox(height: 12),
+              Expanded(child: TargetCard()),
+            ],
+          ),
         ),
       ),
     );

@@ -6,9 +6,10 @@ import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tt
 import 'package:share_plus/share_plus.dart';
 import '../../providers/translator.dart';
 
+/// The translation card's bottom row: speak (tinted), copy and share.
+/// Disabled while there is no translation.
 class TargetActionPanel extends ConsumerStatefulWidget {
-  const TargetActionPanel({super.key, this.text});
-  final String? text;
+  const TargetActionPanel({super.key});
   @override
   ConsumerState<TargetActionPanel> createState() => _ActionPanelState();
 }
@@ -18,25 +19,34 @@ class _ActionPanelState extends ConsumerState<TargetActionPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
     final translation = ref.watch(translatorProvider).value;
     final targetText = translation?.translatedText;
+    final hasText = targetText != null && targetText.isNotEmpty;
     final targetLanguageCode = translation?.targetLanguageCode ?? 'en';
-    if (targetText == null || targetText.isEmpty) return const SizedBox.shrink();
-    return Column(
-      mainAxisAlignment: .spaceBetween,
-      mainAxisSize: .min,
+    return Row(
       children: [
         IconButton(
-          icon: Icon(Icons.copy),
-          onPressed: () => Clipboard.setData(ClipboardData(text: targetText)),
+          tooltip: 'Listen',
+          style: IconButton.styleFrom(
+            backgroundColor: scheme.secondaryContainer.withValues(alpha: 0.6),
+            foregroundColor: scheme.primary,
+          ),
+          onPressed: hasText ? () => _speak(text: targetText, languageCode: targetLanguageCode) : null,
+          icon: const Icon(Icons.volume_up_outlined),
+        ),
+        const SizedBox(width: 4),
+        IconButton(
+          tooltip: 'Copy',
+          color: scheme.onSurfaceVariant,
+          onPressed: hasText ? () => Clipboard.setData(ClipboardData(text: targetText)) : null,
+          icon: const Icon(Icons.content_copy_outlined, size: 20),
         ),
         IconButton(
-          onPressed: () async => _speak(text: targetText, languageCode: targetLanguageCode),
-          icon: Icon(Icons.volume_up),
-        ),
-        IconButton(
-          icon: Icon(Icons.share),
-          onPressed: targetText.isNotEmpty ? () => SharePlus.instance.share(ShareParams(text: targetText)) : null,
+          tooltip: 'Share',
+          color: scheme.onSurfaceVariant,
+          onPressed: hasText ? () => SharePlus.instance.share(ShareParams(text: targetText)) : null,
+          icon: const Icon(Icons.share_outlined, size: 20),
         ),
       ],
     );
