@@ -105,6 +105,9 @@ These are in the code, but haven't been tested on a device since the merge.
   - Decisions (2026-11-18): the dark file's cyan primary is replaced by the light teal so both modes share one hue; the same type and shapes in both modes (the dark file's Space Grotesk and 8px buttons are not used); where a design file's prose and token list disagree, the token list wins.
 - [ ] Step 2: source and translation cards, and the language bar
 - [ ] Step 3: lists, download badges and the drawer
+  - [x] Offline Languages screen and the Translate From / To pickers (2026-11-18): a search field that stays visible (matches English and native names), "Downloaded Languages" and "Available for Download" with counts, rounded cards with the code in a circle and the native name (a fixed table, ML Kit gives none; no sizes, ML Kit doesn't report them), a "System" chip for English, a check badge and delete for the other downloaded languages, a round download button, and a "No languages found" state. On the drawer screen, tapping a missing language downloads it, as the button does. Downloads keep the loader dialog. Delete has a red confirm dialog. This screen's messages are bottom SnackBars ("Spanish removed", "Spanish downloaded"); the download-failed toast shared with home is unchanged. Not yet checked on a device
+  - [ ] Delete `expandabe.search.app.bar.dart`: nothing uses it since the redesign
+  - [ ] Drawer restyle and its storage meter
 
 ## Phase 4: Standout features
 
