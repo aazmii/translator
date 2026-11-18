@@ -43,7 +43,14 @@ dev_dependencies:
   # import_sorter: ^4.6.0
 flutter_launcher_icons:
   android: "launcher_icon"
+  # Pictures of the AppMark widget, rendered by tool/app_icon/ (see there).
   image_path: "assets/icons/app_icon.png"
+  # Android 8+: teal background (light theme primary) + white glyph, so every
+  # launcher shape (circle, squircle, rounded square) shows the same mark.
+  adaptive_icon_background: "#005E53"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  # The foreground picture is already sized for the safe zone; no extra inset.
+  adaptive_icon_foreground_inset: 0
 
 dependency_overrides:
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_translator/src/core/widgets/app_mark.dart';
 
 /// The app bar of the pages with the drawer (translator, settings): menu
 /// (from the Scaffold's drawer), the app icon and [title]. On the translator
@@ -18,12 +19,7 @@ class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
       titleSpacing: 4,
       title: Row(
         children: [
-          Image.asset(
-            'assets/icons/app_icon.png',
-            height: 32,
-            width: 32,
-            errorBuilder: (_, _, _) => const SizedBox.square(dimension: 32),
-          ),
+          const AppMark(size: 32),
           const SizedBox(width: 8),
           Flexible(child: Text(title, overflow: TextOverflow.ellipsis)),
         ],
