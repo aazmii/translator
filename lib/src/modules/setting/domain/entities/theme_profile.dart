@@ -1,6 +1,2 @@
-enum ThemeProfile { light, dark }
-
-extension ThemeProfileToggle on ThemeProfile {
-  ThemeProfile get toggled =>
-      this == ThemeProfile.light ? ThemeProfile.dark : ThemeProfile.light;
-}
+/// The app theme the user picked. [system] follows the device.
+enum ThemeProfile { system, light, dark }

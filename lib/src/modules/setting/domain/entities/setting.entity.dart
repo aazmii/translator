@@ -1,7 +1,7 @@
 import 'theme_profile.dart';
 
 final class AppSettings {
-  const AppSettings({this.firstRun = true, this.theme = ThemeProfile.light});
+  const AppSettings({this.firstRun = true, this.theme = ThemeProfile.system});
 
   final bool firstRun;
   final ThemeProfile theme;

@@ -17,10 +17,4 @@ final class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> changeTheme(ThemeProfile theme) async {
     state = AsyncData(await ref.read(changeThemeProvider)(theme));
   }
-
-  Future<void> toggleTheme() async {
-    final current = state.value;
-    if (current == null) return;
-    await changeTheme(current.theme.toggled);
-  }
 }
