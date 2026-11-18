@@ -103,6 +103,88 @@ void main() {
     expect(SettingsModel.fromJson('{"firstRun":false,"theme":"dark"}').showKeyboardAtStartup, isTrue);
   });
 
+  group('Text size', () {
+    double previewSize(WidgetTester tester) => tester
+        .widget<Text>(find.descendant(of: find.byKey(const Key('textSizePreview')), matching: find.byType(Text)))
+        .style!
+        .fontSize!;
+
+    /// Turns the wheel by [steps] sizes (positive = larger).
+    Future<void> turnWheel(WidgetTester tester, int steps) async {
+      await tester.drag(find.byType(ListWheelScrollView), Offset(0, -44.0 * steps));
+      await tester.pumpAndSettle();
+    }
+
+    Future<void> openDialog(WidgetTester tester) async {
+      await tester.tap(find.text('Text size'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('the subtitle shows the size, 18 by default', (tester) async {
+      await pumpSettings(tester);
+      expect(find.text('18'), findsOneWidget);
+    });
+
+    testWidgets('turning the wheel resizes the preview', (tester) async {
+      await pumpSettings(tester);
+      await openDialog(tester);
+      expect(previewSize(tester), 18);
+
+      await turnWheel(tester, 2);
+      expect(previewSize(tester), 22);
+      expect(repository.saves, 0, reason: 'nothing is saved while the dialog is open');
+    });
+
+    testWidgets('tapping outside closes and saves the picked size', (tester) async {
+      await pumpSettings(tester);
+      await openDialog(tester);
+      await turnWheel(tester, 2);
+
+      await tester.tapAt(const Offset(5, 5));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ListWheelScrollView), findsNothing);
+      expect(repository.settings.textSize, 22);
+      expect(find.text('22'), findsOneWidget);
+    });
+
+    testWidgets('Back closes and saves the picked size', (tester) async {
+      await pumpSettings(tester);
+      await openDialog(tester);
+      await turnWheel(tester, -1);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ListWheelScrollView), findsNothing);
+      expect(repository.settings.textSize, 16);
+    });
+
+    testWidgets('Cancel keeps the old size', (tester) async {
+      await pumpSettings(tester, settings: const AppSettings(textSize: 24));
+      await openDialog(tester);
+      expect(previewSize(tester), 24);
+      await turnWheel(tester, 2);
+
+      await tester.tap(find.text('Cancel'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(ListWheelScrollView), findsNothing);
+      expect(repository.saves, 0);
+      expect(find.text('24'), findsOneWidget);
+    });
+
+    test('saves and loads; missing or odd values load as 18', () {
+      for (final size in AppSettings.textSizes) {
+        final json = SettingsModel.fromEntity(AppSettings(textSize: size)).toJson();
+        expect(SettingsModel.fromJson(json).textSize, size);
+      }
+      expect(SettingsModel.fromJson('{"firstRun":false,"theme":"dark"}').textSize, 18);
+      expect(SettingsModel.fromJson('{"textSize":17}').textSize, 18);
+      expect(SettingsModel.fromJson('{"textSize":"big"}').textSize, 18);
+    });
+  });
+
   test('a saved theme, including system, loads back', () {
     for (final theme in ThemeProfile.values) {
       final json = SettingsModel.fromEntity(AppSettings(theme: theme)).toJson();

@@ -21,4 +21,8 @@ final class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> setKeyboardAtStartup(bool show) async {
     state = AsyncData(await ref.read(setKeyboardAtStartupProvider)(show));
   }
+
+  Future<void> setTextSize(double size) async {
+    state = AsyncData(await ref.read(setTextSizeProvider)(size));
+  }
 }

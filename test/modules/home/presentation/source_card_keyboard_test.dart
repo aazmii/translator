@@ -39,6 +39,16 @@ void main() {
   testWidgets('focuses it when the settings fail to load', (tester) async {
     expect(await sourceFocusedAtStartup(tester, _FailingSettingsRepository()), isTrue);
   });
+
+  testWidgets('the source text uses the saved text size', (tester) async {
+    await sourceFocusedAtStartup(tester, _FakeSettingsRepository(const AppSettings(textSize: 28)));
+    expect(tester.widget<EditableText>(find.byType(EditableText)).style.fontSize, 28);
+  });
+
+  testWidgets('the source text is 18 by default', (tester) async {
+    await sourceFocusedAtStartup(tester, _FakeSettingsRepository(const AppSettings()));
+    expect(tester.widget<EditableText>(find.byType(EditableText)).style.fontSize, 18);
+  });
 }
 
 final class _FakeSettingsRepository implements SettingsRepository {

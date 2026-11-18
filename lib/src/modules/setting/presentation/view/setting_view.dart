@@ -4,8 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart' show Fluttertoast, Toast, ToastG
 
 import '../../../../theme/model/theme.model.dart' show ThemeProfileExtension;
 import '../../../../theme/provider/theme.provider.dart';
+import '../../../home/presentation/home.view/providers/translator.dart';
+import '../../domain/entities/setting.entity.dart';
 import '../../domain/entities/theme_profile.dart';
 import '../providers/settings_provider.dart';
+import 'text_size_dialog.dart';
 
 class SettingView extends ConsumerWidget {
   const SettingView({super.key});
@@ -13,7 +16,9 @@ class SettingView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = ref.watch(themeProvider);
-    final showKeyboard = ref.watch(settingsProvider).value?.showKeyboardAtStartup ?? true;
+    final settings = ref.watch(settingsProvider).value;
+    final showKeyboard = settings?.showKeyboardAtStartup ?? true;
+    final textSize = settings?.textSize ?? AppSettings.defaultTextSize;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
@@ -34,6 +39,12 @@ class SettingView extends ConsumerWidget {
             ),
             onTap: () => _setKeyboard(ref, !showKeyboard),
           ),
+          ListTile(
+            leading: const Icon(Icons.format_size),
+            title: const Text('Text size'),
+            subtitle: Text(textSize.toStringAsFixed(0)),
+            onTap: () => _chooseTextSize(context, ref, textSize),
+          ),
         ],
       ),
     );
@@ -45,6 +56,24 @@ class SettingView extends ConsumerWidget {
     } catch (error, stackTrace) {
       debugPrint('Saving the keyboard setting failed: $error\n$stackTrace');
       _showToast("Couldn't save the setting");
+    }
+  }
+
+  Future<void> _chooseTextSize(BuildContext context, WidgetRef ref, double current) async {
+    final sourceText = ref.read(translatorProvider).value?.sourceText?.trim() ?? '';
+    final picked = await showDialog<double>(
+      context: context,
+      builder: (context) => TextSizeDialog(
+        current: current,
+        previewText: sourceText.isEmpty ? 'Hello, how are you today?' : sourceText,
+      ),
+    );
+    if (picked == null || picked == current) return;
+    try {
+      await ref.read(settingsProvider.notifier).setTextSize(picked);
+    } catch (error, stackTrace) {
+      debugPrint('Saving the text size failed: $error\n$stackTrace');
+      _showToast("Couldn't save the text size");
     }
   }
 
