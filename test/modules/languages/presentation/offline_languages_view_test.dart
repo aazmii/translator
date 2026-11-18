@@ -242,7 +242,8 @@ void main() {
 
   group('sections and search', () {
     const downloadedHeader = 'Downloaded Languages';
-    const availableHeader = 'Available for Download';
+    // Renamed from "Available for Download" in 597d83a ("update text").
+    const availableHeader = 'Available';
 
     Future<void> search(WidgetTester tester, String text) async {
       await tester.enterText(find.byType(TextField), text);
@@ -264,7 +265,7 @@ void main() {
       expect(listed(tester), [downloadedHeader, 'English', 'French', availableHeader, 'Afrikaans']);
     });
 
-    testWidgets('search with only missing languages shows only Available for Download', (tester) async {
+    testWidgets('search with only missing languages shows only the Available section', (tester) async {
       await openPicker(tester);
       await search(tester, 'afr');
 
