@@ -7,6 +7,7 @@ import '../../modules/bookmarks/data/repositories/bookmarks.repository.impl.dart
 import '../../modules/bookmarks/domain/repositories/bookmarks_repository.dart';
 import '../../modules/bookmarks/domain/usecases/get_bookmarks.dart';
 import '../../modules/bookmarks/domain/usecases/remove_bookmark.dart';
+import '../../modules/bookmarks/domain/usecases/restore_bookmark.dart';
 import '../../modules/bookmarks/domain/usecases/save_bookmark.dart';
 import '../../modules/home/data/datasources/translation_local_data_source.dart';
 import '../../modules/home/data/datasources/translation_service_data_source.dart';
@@ -20,12 +21,15 @@ import '../../modules/languages/data/repositories/offline_language_repository_im
 import '../../modules/languages/domain/repositories/offline_language_repository.dart';
 import '../../modules/languages/domain/usecases/delete_language.dart';
 import '../../modules/languages/domain/usecases/download_language.dart';
+import '../../modules/languages/domain/usecases/get_language.dart';
 import '../../modules/languages/domain/usecases/get_offline_languages.dart';
 import '../../modules/setting/data/datasources/settings_local_data_source.dart';
 import '../../modules/setting/data/repositories/setting.repository.dart';
 import '../../modules/setting/domain/repositories/setting.repo.dart';
 import '../../modules/setting/domain/usecases/change_theme.dart';
 import '../../modules/setting/domain/usecases/get_settings.dart';
+import '../../modules/setting/domain/usecases/set_keyboard_at_startup.dart';
+import '../../modules/setting/domain/usecases/set_text_size.dart';
 
 /// Application composition root. Infrastructure implementations are wired to domain
 /// contracts here and nowhere in the presentation layer.
@@ -47,6 +51,9 @@ final saveBookmarkProvider = Provider<SaveBookmark>(
 );
 final removeBookmarkProvider = Provider<RemoveBookmark>(
   (ref) => RemoveBookmark(ref.watch(bookmarksRepositoryProvider)),
+);
+final restoreBookmarkProvider = Provider<RestoreBookmark>(
+  (ref) => RestoreBookmark(ref.watch(bookmarksRepositoryProvider)),
 );
 
 final translationLocalDataSourceProvider = Provider<TranslationLocalDataSource>(
@@ -85,6 +92,9 @@ final languageModelDataSourceProvider = Provider<LanguageModelDataSource>(
 final getOfflineLanguagesProvider = Provider<GetOfflineLanguages>(
   (ref) => GetOfflineLanguages(ref.watch(offlineLanguageRepositoryProvider)),
 );
+final getLanguageProvider = Provider<GetLanguage>(
+  (ref) => GetLanguage(ref.watch(offlineLanguageRepositoryProvider)),
+);
 final downloadLanguageProvider = Provider<DownloadLanguage>(
   (ref) => DownloadLanguage(ref.watch(offlineLanguageRepositoryProvider)),
 );
@@ -103,4 +113,10 @@ final getSettingsProvider = Provider<GetSettings>(
 );
 final changeThemeProvider = Provider<ChangeTheme>(
   (ref) => ChangeTheme(ref.watch(settingsRepositoryProvider)),
+);
+final setKeyboardAtStartupProvider = Provider<SetKeyboardAtStartup>(
+  (ref) => SetKeyboardAtStartup(ref.watch(settingsRepositoryProvider)),
+);
+final setTextSizeProvider = Provider<SetTextSize>(
+  (ref) => SetTextSize(ref.watch(settingsRepositoryProvider)),
 );

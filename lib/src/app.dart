@@ -8,6 +8,8 @@ import 'config/localization/loalization.dart' show localizationsDelegates, onGen
 import 'config/router/view/router.dart' show AppRouter;
 import 'theme/model/theme.model.dart' show ThemeProfileExtension;
 import 'theme/provider/theme.provider.dart' show themeProvider;
+import 'theme/themes/dark/dark.theme.dart' show darkTheme;
+import 'theme/themes/light/light.theme.dart' show lightTheme;
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -16,7 +18,9 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp(
       localizationsDelegates: localizationsDelegates,
-      theme: ref.watch(themeProvider).theme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
+      themeMode: ref.watch(themeProvider).themeMode,
       supportedLocales: supportedLocales,
       debugShowCheckedModeBanner: false,
       onGenerateTitle: onGenerateTitle,

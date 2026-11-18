@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CustomTextField extends StatelessWidget {
+import '../../../../setting/domain/entities/setting.entity.dart';
+import '../../../../setting/presentation/providers/settings_provider.dart';
+
+/// The source / translation text field. Its font size is the Text size
+/// setting.
+class CustomTextField extends ConsumerWidget {
   const CustomTextField({
     super.key,
     // this.initialValue,
@@ -11,7 +17,9 @@ class CustomTextField extends StatelessWidget {
     this.autofocus = false,
     this.focusNode,
     this.hintText,
+    this.contentPadding = const EdgeInsets.fromLTRB(8, 18, 0, 0),
   });
+  final EdgeInsetsGeometry contentPadding;
   // final String? initialValue;
   final bool? readOnly, showLoader;
   // final ValueChanged<String>? onChanged;
@@ -20,7 +28,8 @@ class CustomTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final String? hintText;
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final textSize = ref.watch(settingsProvider.select((s) => s.value?.textSize)) ?? AppSettings.defaultTextSize;
     return Scrollbar(
       child: Stack(
         children: [
@@ -29,12 +38,11 @@ class CustomTextField extends StatelessWidget {
             controller: controller,
             readOnly: readOnly ?? false,
             autofocus: autofocus!,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontSize: textSize),
             expands: true,
             maxLines: null,
             textAlignVertical: TextAlignVertical.top,
-            decoration: InputDecoration(
-              contentPadding: EdgeInsets.fromLTRB(8, 18, 0, 0),
-            ),
+            decoration: InputDecoration(contentPadding: contentPadding, hintText: hintText),
           ),
           if (showLoader!) const Center(child: CircularProgressIndicator())
         ],

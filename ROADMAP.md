@@ -8,74 +8,122 @@ Last updated: 2026-11-05
 
 ## Current status
 
-- Packages resolve, and `flutter analyze` reports 0 errors.
-- The debug APK builds.
-- Not yet checked: running the app on a device, and a release build.
+- `dev` includes merge commit `da0b2a6` and matches `origin/dev`.
+- `flutter analyze` reports 0 errors and 1 warning (the unused `nose` variable).
+- All 10 tests pass.
+- A release APK was built just before the merge commit.
+- Not yet checked: running the merged app on a device.
 
 ## Done
 
 ### Toolchain upgrade (2026-11-05)
 
-- [x] Fix the dependency conflict between the Isar and Riverpod generators
-- [x] Update `isar_community` and its generator to 3.4.1
+- [x] Fix the dependency conflict that stopped packages resolving
 - [x] Update `flutter_riverpod` to ^3.4.3, `riverpod_annotation` to ^4.0.7 and `riverpod_generator` to ^4.0.9
 - [x] Remove `custom_lint`, which conflicts with the analyzer version `riverpod_generator` needs
-- [x] Regenerate the `*.g.dart` files
 - [x] Update Gradle to 8.14, AGP to 8.11.1 and Kotlin to 2.2.20
 
-## Next up: verify the upgrade
+### Merged from `origin/dev` (2026-11-05)
+
+These are in the code, but haven't been tested on a device since the merge.
+
+- [x] Replace Isar with Hive for local storage
+- [x] Move to a clean-architecture structure, with tests for the dependency rules
+- [x] Bookmarks: save from the source panel, then view and delete them in a Bookmarks screen
+- [x] Share translations
+- [x] Voice input screen (online only for now, see Phase 3)
+- [x] App icon
+
+### Bugs fixed by the merge
+
+- [x] Close each translator after use, and stop creating one on every state change
+- [x] Swap languages instead of allowing the same source and target
+- [x] Use the correct speech language for the source and target panels
+- [x] Refresh the Offline Languages list after a download or delete
+- [x] Stop rows on the Offline Languages screen from changing the source language
+
+## Next up: verify the merge
 
 - [ ] Run the app on a device
-- [ ] Confirm the saved language choice survives the upgrade
-- [ ] Run a release build
-- [ ] Commit the upgrade
+- [ ] Test bookmarks, share, speech and language downloads
+- [ ] Confirm the app handles the move to Hive cleanly (there is no Isar migration, so saved settings and languages reset once)
 
 ## Phase 1: Bug fixes
 
 ### Translation
 
-- [ ] Handle translation errors and show a message instead of failing silently
-- [ ] Stop models downloading silently during translation, with no progress or Wi-Fi check
-- [ ] Reuse `OnDeviceTranslator` instead of creating one on every state change
-- [ ] Close translators when they are no longer needed
+- [x] Handle errors in `translate()` and show a message instead of failing silently (shows a toast and clears the old translation; not yet checked on a device)
+- [x] Check that a language is downloaded before translating (2026-11-17). Otherwise the plugin calls `downloadModelIfNeeded()` first: online it downloads silently over any connection, offline it never returns. Missing models now show a toast pointing to Offline Languages; not yet checked on a device
+- [x] Stop `translate()` overwriting state changes made while it waits (if the text or a language changed meanwhile, the outcome is now dropped silently; covered by tests, hard to trigger by hand)
+- [ ] The translation card keeps showing the old translation after the source text is edited or a language is picked (found 2026-11-19; `setSourceText`, `setSourceLanguage` and `setTargetLanguage` in `translator.dart` don't clear or redo it). Bookmarks are already safe: they use `translationOrigin`. Decide whether to clear the translation, translate again, or mark it as out of date
 
 ### Languages
 
-- [ ] Fix `setTargetLanguage`, which compares against the target instead of the source
-- [ ] Prevent source and target from being the same language
-- [ ] Swap the text as well as the languages when the user presses swap
+- [x] Swap the text as well as the languages, because the old text was translated as the wrong language (with a translation, swap exchanges the texts and doesn't translate again; without one, it swaps languages only, and the swap button then translates in the new direction; not yet checked on a device)
 
-### Speech
+### Action panels
 
-- [ ] Use the correct speech language for the source and target panels
+- [x] Use a copy icon on the source panel's copy button (it showed the paste icon; not yet checked on a device)
+- [x] Decide whether bookmarking should be allowed before a translation exists (decided 2026-11-17: keep as is; a bookmark can be saved without a translation)
 
 ### Offline Languages screen
 
-- [ ] Refresh the list after a download or delete
-- [ ] Show progress while a language downloads
-- [ ] Stop rows on this screen from changing the source language and closing it
-- [ ] Rename "Recent Languages", or add real recent-language tracking
-- [ ] Fix the section headers when no languages are downloaded
+- [x] Show progress while a language downloads (a spinner with Cancel, from both the row and the download icon, over any connection; ML Kit reports no real progress; not yet checked on a device)
+- [x] Show a message when a download or delete fails (toasts for both; not yet checked on a device)
+- [x] Confirm before deleting a language, and say so when it's the selected source or target (it stays selected; translating later offers the download; not yet checked on a device)
+- [x] Rename "Recent Languages", or add real recent-language tracking (renamed to "Downloaded", which is what the section lists)
+- [x] Fix the section headers when no languages are downloaded (most visible when searching, e.g. "afr" showed Afrikaans under the first header; headers are now decided per row; not yet checked on a device)
+- [x] Hide the delete button for English (built into ML Kit; tapping it did nothing on a device, 2026-11-17). Hidden by the code `en`, not by anything ML Kit reports; not yet checked on a device
 - [ ] Resolve the performance TODO in `offline.languages.view.dart`
 
 ## Phase 2: Dependable offline use
 
-- [ ] First-run setup for choosing and downloading languages
+- [ ] First-run setup for choosing and downloading languages (`firstRun` is stored, but no setup screen uses it yet)
 - [ ] Show the model size before download (roughly 30 MB per language)
 - [ ] Add a Wi-Fi-only download option
 - [ ] Mark which languages are ready to use offline
-- [ ] Offer a download when a selected language is missing
+- [x] Offer a download when a selected language is missing (in the Translate From / To picker: asks, downloads over any connection behind a loader with Cancel, then selects it; not yet checked on a device)
+- [x] Offer a download when translating with a missing language (home screen: send, paste and swap ask to download, then translate; covers deleted languages, first-run defaults and older saved settings; prompt, download and translate confirmed working on a device 2026-11-17; paste, swap, offline Cancel and the keyboard not separately confirmed)
 
 ## Phase 3: Everyday features
 
 - [ ] Translation history
-- [ ] Favourites (connect the disabled bookmark buttons)
-- [ ] Share translations (connect the disabled share button)
 - [ ] Confirm when text is copied
 - [ ] "Translate" option in Android's text-selection menu
 - [ ] Accept text shared from other apps
-- [ ] Voice input (connect the mic button; offline support depends on the device's speech packs)
-- [ ] Check right-to-left display for Arabic, Hebrew and Urdu
+- [x] Voice input as a draft dialog (2026-11-17): nothing is written to the source box until Insert; Try again discards the last phrase and waits for the mic; the mic adds phrases; readable errors; Insert appends and translates; the language is matched to a device speech locale. Not yet checked on a device
+- [x] Android: use the Google speech dialog first (2026-11-18): the mic opens the system "Try saying something" screen in the app bar's source language; the text goes straight into the source box and translates. If the Google dialog fails (no network, nothing heard), without the Google app, and on iOS/web, the draft dialog above opens instead; closing the Google dialog does nothing. We ask it to finish after 2 s of silence (the Google app may ignore that). Confirmed working on a device 2026-11-18
+- [x] Settings: a Theme tile (2026-11-18) showing the current theme; tapping it opens a dialog with Device theme, Light and Dark (tap applies and saves) and Cancel. New installs follow the device; themes saved before keep working. Confirmed working on a device 2026-11-18
+- [x] Settings: a Keyboard tile (2026-11-18) with a checkbox for "Show the keyboard at startup", on by default (also for settings saved before). The home screen waits for the settings before focusing the source field; a change applies from the next start. Confirmed working on a device 2026-11-18
+- [x] Settings: a Text size tile (2026-11-18) for the source and translation text only (14–32 in steps of 2, default 18; the rest of the app is unchanged). The dialog has a preview (the current source text, or a sample) and a wheel; tapping outside or Back applies, Cancel keeps the old size. Missing or invalid saved values load as 18. Confirmed working on a device 2026-11-18
+  - Decision (2026-11-18): the app keeps ignoring the phone's own font size (`TextScaler.linear(1)` in `app.dart`), so system font scaling can't break the app bar, drawer or dialogs.
+- [ ] Offline voice input (`onDevice` is currently `false`; offline support also depends on the device's speech packs)
+- [ ] Right-to-left display for Arabic, Hebrew and Urdu (the text fields don't set a direction yet)
+
+## Design: Teal Meridian (from Stitch, `design/DESIGN.md` and `design/DESIGN_DARK.md`)
+
+- [x] Step 1, theme (2026-11-18): light colours from the token list in `DESIGN.md`; dark surfaces, outlines and error colours from `DESIGN_DARK.md`, with accents generated from the light teal `#00796B`. Inter 4.1 bundled (400/500/600/700, about 1.7 MB) with the design's type scale; cards 16px, dialogs 24px, drawer 28px, pill buttons and chips. Not yet checked on a device
+  - Decisions (2026-11-18): the dark file's cyan primary is replaced by the light teal so both modes share one hue; the same type and shapes in both modes (the dark file's Space Grotesk and 8px buttons are not used); where a design file's prose and token list disagree, the token list wins.
+- [x] Step 2, translator page (2026-11-19, from Stitch's translator screen HTML; the old page is on branch `backup/translator-before-redesign`): app bar with the app icon and "Translator"; a language bar (two pills and a round teal swap button, keeping the slide-and-spin swap) below it; two 28px cards sharing the screen 50/50. Source card: Clear top-right, the text only (no empty-state content), then Listen · Copy · Bookmark (40px) and Mic (44px) · Translate pill (44px high). Translation card: language name in small capitals with an "On-device" badge, the text, then Listen (tinted) · Copy · Share. On phones narrower than 360px the source toolbar is scaled down to fit. Not yet checked on a device
+  - Decisions (2026-11-19): bookmarking stays in the source card (keeps the 2026-11-17 decision that a bookmark works before translating); the 50/50 layout is kept instead of the HTML's scrolling page so the translation stays above the keyboard; left out because the app has no data or feature for them: profile avatar, offline-pack banner, engine status card, pronunciation line, quick phrases, full-screen view, character counter, sample phrase.
+  - The Paste button is gone with the empty state; pasting works through the text field's own long-press menu (it doesn't translate automatically).
+  - [x] Translation card made plain and identical to the source card (2026-11-19): same white surface, padding, text style and size, plain 40px Listen · Copy · Share; the target language's name in plain text on top; a Save pill (36px, "bookmark add" icon) on the right, enabled once there is a translation. Not yet checked on a device
+    - Decisions (2026-11-19): no decoration on the translation card (no glow, no "On-device" badge, no small-capitals name, no tinted Listen, no medium/relaxed text), overriding the Stitch HTML; the star stays in the source card (bookmarking before translating, 2026-11-17) and Save is added to the translation card, with no star there; both call one shared function (`helpers/bookmark.current.dart`), so they save the same bookmark, with the translation only when it was made from the current text.
+- [x] App mark (2026-11-19): one teal rounded square with a white `Icons.translate` glyph (`lib/src/core/widgets/app_mark.dart`) in the app bar, the drawer header and as the launcher icon (adaptive, background `#005E53`). The launcher pictures are rendered from the widget by `tool/app_icon/generate_app_icon_test.dart`; rerun it and `dart run flutter_launcher_icons` after changing the mark. Not yet checked on a device
+  - Decision (2026-11-19): `Icons.translate`, not the drawer's earlier `Icons.g_translate`, which is drawn after Google Translate's logo (impersonation risk on Google Play).
+- [ ] Step 3: lists, download badges and the drawer
+  - [x] Offline Languages screen and the Translate From / To pickers (2026-11-18): a search field that stays visible (matches English and native names), "Downloaded Languages" and "Available for Download" with counts, rounded cards with the code in a circle and the native name (a fixed table, ML Kit gives none; no sizes, ML Kit doesn't report them), a "System" chip for English, a check badge and delete for the other downloaded languages, a round download button, and a "No languages found" state. On the drawer screen, tapping a missing language downloads it, as the button does. Downloads keep the loader dialog. Delete has a red confirm dialog. This screen's messages are bottom SnackBars ("Spanish removed", "Spanish downloaded"); the download-failed toast shared with home is unchanged. Not yet checked on a device
+  - [ ] Delete `expandabe.search.app.bar.dart`: nothing uses it since the redesign
+  - [x] Drawer restyle (2026-11-19, from Stitch's drawer screen HTML): header with a teal app mark, "Go Translator", "Offline translator" and a close button; pill tiles for Offline Languages ("N installed", counting English), Bookmarks ("N saved") and Settings ("Theme, Keyboard, Text size"); a privacy card; "Version x.y.z" at the bottom. Tapping a destination closes the drawer before opening it. Badges and version are hidden while loading or on error. The Translate tile was removed the same day (see the superseded entry below). Not yet checked on a device
+    - Decisions (2026-11-19): no engine chip or pulsing dot (the app has no engine version or online state); the privacy card says "Translated on your device / Text you translate is not sent to a server." instead of "Zero Data Sent ... 100% private", because the Android mic uses Google's online speech dialog; the version is read with `package_info_plus` (new dependency) instead of the design's made-up "v2.4.0"; no Dismiss link (the close button and the scrim already close it).
+  - [x] Drawer on Settings too (2026-11-19, from Stitch's settings screen):
+    - **Superseded 2026-11-19:** you asked for back arrows instead: Settings and Bookmarks have a normal app bar with a back arrow and no drawer, and the drawer has no Translate tile. It is only on the translator page, and every tile opens its screen on top of it. `fadeReplace` and the drawer's `current` page were removed. The text below is the old behaviour.
+    - Old behaviour: Settings uses the translator page's app bar (menu, app icon, "Settings") instead of a back arrow, and its drawer highlights Settings. From Settings, Translate goes back to the translator page, Settings just closes the drawer, and Offline Languages / Bookmarks replace Settings, so Back from them returns to the translator page. Android Back from Settings still returns to the translator page. Offline Languages keeps its back arrow (Bookmarks got the drawer too, see below). Not yet checked on a device
+  - [x] Bookmarks screen (2026-11-19, from Stitch's saved bookmarks screen): a normal app bar with a back arrow, no drawer (the design's menu and drawer were not used, see the superseded entry above); a pill search field matching the source or translation text (ignores case) with a clear button; "SAVED" and, when any bookmark has a date, "Newest first"; one card per bookmark with the date ("Today, 10:14 AM", "Yesterday", "12 Nov 2026"), the source text and translation with their language codes, Listen (only with a translation in a known language), Copy and Share (the translation, or the text without one), and Delete. Delete (button or swipe left) removes at once; the "Bookmark deleted" SnackBar has Undo, which restores it unchanged, and goes away after the usual timeout (`persist: false`; with an action it would otherwise stay). Empty state: "No bookmarks yet / Tap the star on the translator page to save a phrase here."; a search with no results says "No bookmarks match". Not yet checked on a device
+    - Decisions (2026-11-19): new bookmarks store when they were saved and both language codes; older bookmarks show without them (no date, codes or Listen) and are listed after dated ones. The languages are those the translation was made in, not the current selection: the translator remembers the text and languages of its current translation, and Bookmark saves the translation only if it was made from the text now in the box (otherwise the text alone, in the selected source language). Left out: the avatar, the star on each card (deleting is the only way to unsave), the pronunciation line, the "Quick Tip" (offline speech depends on the phone's voices), the "Empty State Preview" label and copy/share toasts (the translator page has none either).
+  - [ ] Drawer storage meter: left out because ML Kit doesn't report model sizes and the app can't read device storage
+  - [x] Settings screen (2026-11-19, from Stitch's settings screen HTML; the old screen is on branch `backup/settings-before-redesign`): a PREFERENCES group (Theme; "Show the keyboard at startup" with "Automatically focus text input when app opens" and a rounded checkbox; "Translation text size" showing "18 sp") and an ABOUT group (App version via `package_info_plus`; Open source licences opening Flutter's licences page, with the Inter font licence registered in `main.dart`). Theme dialog: "Choose theme" with a description per option. Text size dialog: size badge, "Output preview" card, the wheel between "A (14)" and "A (32)", and a note that only translation text changes; it scrolls on short screens. Not yet checked on a device
+    - Decisions (2026-11-19): the wheel and its closing rules from 2026-11-18 are kept instead of the design's slider, "Default (18)" and "Done"; left out because the app has no data or feature for them: clear cache, "Engine Ready", "Latest", the "100% private" card (the Android mic uses Google's online speech dialog), the profile avatar and the French filler line.
 
 ## Phase 4: Standout features
 
@@ -89,12 +137,15 @@ Last updated: 2026-11-05
 - [ ] Replace the `com.example.translator` package name
 - [ ] Add a release signing key
 - [ ] Check ML Kit's attribution requirements
+- [x] Show the Inter font licence (SIL OFL, `assets/fonts/Inter-LICENSE.txt`) in the app's licences page (2026-11-19: registered in `main.dart`, bundled as an asset, confirmed inside the debug APK; reached from Settings > Open source licences)
 - [ ] Tell users that on-device translation is less accurate than cloud services
 - [ ] Replace the default app description in `pubspec.yaml`
 
 ## Maintenance
 
 - [ ] Plan the upgrade to Gradle 9.1+ and AGP 9.0.1+, because Flutter will soon drop support for the current versions
+- [ ] Decide whether to restore `flutter_lints`, which the merge removed from the project
 - [ ] Stop tracking `android/build/reports/problems/problems-report.html` in git
 - [ ] Remove the `MyApp2`, `InheritedNose` and `HelloWidget` experiments if they are no longer needed
+- [ ] Delete `meaning.display.widget.dart`: nothing uses its `TranslationDisplayWidget`
 - [ ] Keep the project and pub cache on the same drive if Kotlin builds stay slow

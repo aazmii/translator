@@ -17,7 +17,8 @@ class TranslationDisplayWidget extends StatelessWidget {
               crossAxisAlignment: .start,
               children: [
                 Expanded(child: CustomTextField()),
-                SourceActionPanel(text: targetText),
+                // Unused widget; the panels never read the old `text` argument.
+                SourceActionPanel(controller: TextEditingController(text: sourceText)),
               ],
             ),
           ),
@@ -35,7 +36,7 @@ class TranslationDisplayWidget extends StatelessWidget {
                     // showLoader: true,
                   ),
                 ),
-                TargetActionPanel(text: targetText),
+                TargetActionPanel(),
               ],
             ),
           ),
