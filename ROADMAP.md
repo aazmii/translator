@@ -91,6 +91,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] "Translate" option in Android's text-selection menu
 - [ ] Accept text shared from other apps
 - [x] Voice input as a draft dialog (2026-11-17): nothing is written to the source box until Insert; Try again discards the last phrase and waits for the mic; the mic adds phrases; readable errors; Insert appends and translates; the language is matched to a device speech locale. Not yet checked on a device
+- [x] Android: use the Google speech dialog first (2026-11-18): the mic opens the system "Try saying something" screen in the app bar's source language; the text goes straight into the source box and translates. If the Google dialog fails (no network, nothing heard), without the Google app, and on iOS/web, the draft dialog above opens instead; closing the Google dialog does nothing. We ask it to finish after 2 s of silence, but the Google app may ignore that. Not yet checked on a device
 - [ ] Offline voice input (`onDevice` is currently `false`; offline support also depends on the device's speech packs)
 - [ ] Right-to-left display for Arabic, Hebrew and Urdu (the text fields don't set a direction yet)
 
