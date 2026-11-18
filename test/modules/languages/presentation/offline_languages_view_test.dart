@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_translator/src/config/di/providers.dart';
+import 'package:go_translator/src/modules/languages/presentation/components/language.card.dart';
 import 'package:go_translator/src/modules/languages/presentation/view/offline.languages.view.dart';
 
 import '../../../helpers/fake_offline_language_repository.dart';
@@ -38,6 +39,7 @@ void main() {
   Future<({bool Function() isOpen, String? Function() result})> openPicker(
     WidgetTester tester, {
     String? targetLanguageCode,
+    bool selectionMode = true,
   }) async {
     String? picked;
     var open = false;
@@ -53,8 +55,8 @@ void main() {
                   context,
                   MaterialPageRoute(
                     builder: (_) => OfflineLanguagesView(
-                      title: 'Translate To',
-                      selectionMode: true,
+                      title: selectionMode ? 'Translate To' : 'Offline Languages',
+                      selectionMode: selectionMode,
                       sourceLanguageCode: 'en',
                       targetLanguageCode: targetLanguageCode,
                     ),
@@ -171,18 +173,19 @@ void main() {
     expect(toasts, isEmpty);
   });
 
-  testWidgets('English has no delete button; other downloaded languages do', (tester) async {
+  Finder rowOf(String name) => find.widgetWithText(LanguageCard, name);
+
+  testWidgets('English has no delete button but a System chip; other downloaded languages have delete', (tester) async {
     await openPicker(tester);
 
-    Finder buttonIn(String name) =>
-        find.descendant(of: find.widgetWithText(ListTile, name), matching: find.byType(IconButton));
-    expect(buttonIn('English'), findsNothing);
-    expect(find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.delete)), findsOneWidget);
+    expect(find.descendant(of: rowOf('English'), matching: find.byType(IconButton)), findsNothing);
+    expect(find.descendant(of: rowOf('English'), matching: find.text('System')), findsOneWidget);
+    expect(find.descendant(of: rowOf('French'), matching: find.byIcon(Icons.delete_outline)), findsOneWidget);
   });
 
   group('delete', () {
-    Finder trashIn(String name) =>
-        find.descendant(of: find.widgetWithText(ListTile, name), matching: find.byIcon(Icons.delete));
+    Finder trashIn(String name) => find.descendant(of: rowOf(name), matching: find.byIcon(Icons.delete_outline));
+    const frenchWarning = "You won't be able to translate French offline until you download it again.";
 
     testWidgets('asks first; Cancel deletes nothing', (tester) async {
       await openPicker(tester);
@@ -190,7 +193,7 @@ void main() {
       await tester.tap(trashIn('French'));
       await tester.pumpAndSettle();
       expect(find.text('Delete French?'), findsOneWidget);
-      expect(find.text("You'll need to download it again to use it."), findsOneWidget);
+      expect(find.text(frenchWarning), findsOneWidget);
 
       await tester.tap(find.text('Cancel'));
       await tester.pumpAndSettle();
@@ -208,10 +211,8 @@ void main() {
 
       expect(languages.deletes, ['fr']);
       expect(trashIn('French'), findsNothing);
-      expect(
-        find.descendant(of: find.widgetWithText(ListTile, 'French'), matching: find.byIcon(Icons.download)),
-        findsOneWidget,
-      );
+      expect(find.descendant(of: rowOf('French'), matching: find.byIcon(Icons.download)), findsOneWidget);
+      expect(find.text('French removed'), findsOneWidget);
       expect(picker.isOpen(), isTrue);
     });
 
@@ -221,10 +222,7 @@ void main() {
       await tester.tap(trashIn('French'));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text("French is your current target language. You'll need to download it again to use it."),
-        findsOneWidget,
-      );
+      expect(find.text('French is your current target language. $frenchWarning'), findsOneWidget);
     });
 
     testWidgets('a failed delete shows a message', (tester) async {
@@ -236,58 +234,64 @@ void main() {
       await tester.tap(find.text('Delete'));
       await tester.pumpAndSettle();
 
-      expect(toasts, ["Couldn't delete French. Please try again."]);
+      expect(find.text("Couldn't delete French. Please try again."), findsOneWidget);
+      expect(toasts, isEmpty);
       expect(trashIn('French'), findsOneWidget);
-      await tester.pump(_toastTimer);
     });
   });
 
-  group('section headers', () {
+  group('sections and search', () {
+    const downloadedHeader = 'Downloaded Languages';
+    const availableHeader = 'Available for Download';
+
     Future<void> search(WidgetTester tester, String text) async {
-      await tester.tap(find.byIcon(Icons.search));
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField), text);
       await tester.pumpAndSettle();
     }
 
-    /// The text of each header, top to bottom, with the language under it.
-    List<String> headersWithFirstLanguage(WidgetTester tester) {
-      return tester.widgetList<Column>(find.byType(Column)).where((column) {
-        return column.children.length == 2 && column.children.first is Text && column.children.last is ListTile;
-      }).map((column) {
-        final header = (column.children.first as Text).data!;
-        final language = ((column.children.last as ListTile).title as Text).data!;
-        return '$header: $language';
-      }).toList();
+    /// Section headers and language names, top to bottom.
+    List<String> listed(WidgetTester tester) {
+      final names = {'English', 'French', 'Afrikaans', downloadedHeader, availableHeader};
+      final texts = find.byWidgetPredicate((widget) => widget is Text && names.contains(widget.data));
+      final found = texts.evaluate().toList()
+        ..sort((a, b) => tester.getTopLeft(find.byWidget(a.widget)).dy.compareTo(tester.getTopLeft(find.byWidget(b.widget)).dy));
+      return found.map((element) => (element.widget as Text).data!).toList();
     }
 
-    testWidgets('full list: Downloaded above English, Other Languages above Afrikaans', (tester) async {
+    testWidgets('full list: downloaded languages, then available ones', (tester) async {
       await openPicker(tester);
 
-      expect(headersWithFirstLanguage(tester), ['Downloaded: English', 'Other Languages: Afrikaans']);
-      expect(find.text('Recent Languages'), findsNothing);
+      expect(listed(tester), [downloadedHeader, 'English', 'French', availableHeader, 'Afrikaans']);
     });
 
-    testWidgets('search with only missing languages shows only Other Languages', (tester) async {
+    testWidgets('search with only missing languages shows only Available for Download', (tester) async {
       await openPicker(tester);
       await search(tester, 'afr');
 
-      expect(headersWithFirstLanguage(tester), ['Other Languages: Afrikaans']);
+      expect(listed(tester), [availableHeader, 'Afrikaans']);
     });
 
-    testWidgets('search with only downloaded languages shows only Downloaded', (tester) async {
+    testWidgets('search with only downloaded languages shows only Downloaded Languages', (tester) async {
       await openPicker(tester);
       await search(tester, 'fre');
 
-      expect(headersWithFirstLanguage(tester), ['Downloaded: French']);
+      expect(listed(tester), [downloadedHeader, 'French']);
     });
 
-    testWidgets('search with no matches shows no headers', (tester) async {
+    testWidgets('search matches the native name', (tester) async {
+      await openPicker(tester);
+      await search(tester, 'Fran');
+
+      expect(listed(tester), [downloadedHeader, 'French']);
+    });
+
+    testWidgets('search with no matches shows No languages found', (tester) async {
       await openPicker(tester);
       await search(tester, 'zzz');
 
-      expect(headersWithFirstLanguage(tester), isEmpty);
-      expect(find.byType(ListTile), findsNothing);
+      expect(listed(tester), isEmpty);
+      expect(find.byType(LanguageCard), findsNothing);
+      expect(find.text('No languages found'), findsOneWidget);
     });
   });
 
@@ -313,6 +317,37 @@ void main() {
     expect(picker.result(), isNull);
     expect(languages.downloads.single, (code: 'af', wifiOnly: false));
     expect(find.byIcon(Icons.download), findsNothing); // Afrikaans now shows delete
+    expect(find.text('Afrikaans downloaded'), findsOneWidget);
+  });
+
+  testWidgets('Offline Languages screen: tapping a missing row downloads it without asking', (tester) async {
+    languages.pendingDownload = Completer<bool>();
+    final screen = await openPicker(tester, selectionMode: false);
+
+    await tester.tap(find.text('Afrikaans'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+    expect(find.text('Download Afrikaans?'), findsNothing);
+    expect(find.text('Downloading Afrikaans…'), findsOneWidget);
+
+    languages.pendingDownload!.complete(true);
+    await tester.pumpAndSettle();
+
+    expect(screen.isOpen(), isTrue);
+    expect(screen.result(), isNull);
+    expect(languages.downloads.single, (code: 'af', wifiOnly: false));
+    expect(find.text('Afrikaans downloaded'), findsOneWidget);
+  });
+
+  testWidgets('Offline Languages screen: tapping a downloaded row does nothing', (tester) async {
+    final screen = await openPicker(tester, selectionMode: false);
+
+    await tester.tap(find.text('French'));
+    await tester.pumpAndSettle();
+
+    expect(screen.isOpen(), isTrue);
+    expect(languages.downloads, isEmpty);
+    expect(languages.deletes, isEmpty);
   });
 
   testWidgets('a failed download from the icon shows a message', (tester) async {
