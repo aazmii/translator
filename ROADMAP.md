@@ -113,6 +113,8 @@ These are in the code, but haven't been tested on a device since the merge.
     - Decisions (2026-11-19): no engine chip or pulsing dot (the app has no engine version or online state); the privacy card says "Translated on your device / Text you translate is not sent to a server." instead of "Zero Data Sent ... 100% private", because the Android mic uses Google's online speech dialog; the version is read with `package_info_plus` (new dependency) instead of the design's made-up "v2.4.0"; no Dismiss link (the close button and the scrim already close it).
   - [x] Drawer on Settings too (2026-11-19, from Stitch's settings screen): Settings uses the translator page's app bar (menu, app icon, "Settings") instead of a back arrow, and its drawer highlights Settings. From Settings, Translate goes back to the translator page, Settings just closes the drawer, and Offline Languages / Bookmarks replace Settings, so Back from them returns to the translator page. Android Back from Settings still returns to the translator page. Bookmarks and Offline Languages keep their back arrows. Not yet checked on a device
   - [ ] Drawer storage meter: left out because ML Kit doesn't report model sizes and the app can't read device storage
+  - [x] Settings screen (2026-11-19, from Stitch's settings screen HTML; the old screen is on branch `backup/settings-before-redesign`): a PREFERENCES group (Theme; "Show the keyboard at startup" with "Automatically focus text input when app opens" and a rounded checkbox; "Translation text size" showing "18 sp") and an ABOUT group (App version via `package_info_plus`; Open source licences opening Flutter's licences page, with the Inter font licence registered in `main.dart`). Theme dialog: "Choose theme" with a description per option. Text size dialog: size badge, "Output preview" card, the wheel between "A (14)" and "A (32)", and a note that only translation text changes; it scrolls on short screens. Not yet checked on a device
+    - Decisions (2026-11-19): the wheel and its closing rules from 2026-11-18 are kept instead of the design's slider, "Default (18)" and "Done"; left out because the app has no data or feature for them: clear cache, "Engine Ready", "Latest", the "100% private" card (the Android mic uses Google's online speech dialog), the profile avatar and the French filler line.
 
 ## Phase 4: Standout features
 
@@ -126,7 +128,7 @@ These are in the code, but haven't been tested on a device since the merge.
 - [ ] Replace the `com.example.translator` package name
 - [ ] Add a release signing key
 - [ ] Check ML Kit's attribution requirements
-- [ ] Show the Inter font licence (SIL OFL, `assets/fonts/Inter-LICENSE.txt`) in the app's licences page
+- [x] Show the Inter font licence (SIL OFL, `assets/fonts/Inter-LICENSE.txt`) in the app's licences page (2026-11-19: registered in `main.dart`, bundled as an asset, confirmed inside the debug APK; reached from Settings > Open source licences)
 - [ ] Tell users that on-device translation is less accurate than cloud services
 - [ ] Replace the default app description in `pubspec.yaml`
 
