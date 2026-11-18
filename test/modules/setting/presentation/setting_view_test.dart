@@ -64,6 +64,45 @@ void main() {
     expect(find.text('Dark'), findsOneWidget);
   });
 
+  testWidgets('Keyboard is ticked by default', (tester) async {
+    await pumpSettings(tester);
+    expect(find.text('Keyboard'), findsOneWidget);
+    expect(find.text('Show the keyboard at startup'), findsOneWidget);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+  });
+
+  testWidgets('tapping the Keyboard row or its checkbox saves the change', (tester) async {
+    await pumpSettings(tester);
+
+    await tester.tap(find.text('Keyboard'));
+    await tester.pumpAndSettle();
+    expect(repository.settings.showKeyboardAtStartup, isFalse);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pumpAndSettle();
+    expect(repository.settings.showKeyboardAtStartup, isTrue);
+    expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
+  });
+
+  testWidgets('changing the theme keeps the keyboard setting', (tester) async {
+    await pumpSettings(tester, settings: const AppSettings(showKeyboardAtStartup: false));
+    await tester.tap(find.text('Theme'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dark'));
+    await tester.pumpAndSettle();
+    expect(repository.settings.theme, ThemeProfile.dark);
+    expect(repository.settings.showKeyboardAtStartup, isFalse);
+  });
+
+  test('the keyboard setting saves and loads; older settings default to show', () {
+    for (final show in [true, false]) {
+      final json = SettingsModel.fromEntity(AppSettings(showKeyboardAtStartup: show)).toJson();
+      expect(SettingsModel.fromJson(json).showKeyboardAtStartup, show);
+    }
+    expect(SettingsModel.fromJson('{"firstRun":false,"theme":"dark"}').showKeyboardAtStartup, isTrue);
+  });
+
   test('a saved theme, including system, loads back', () {
     for (final theme in ThemeProfile.values) {
       final json = SettingsModel.fromEntity(AppSettings(theme: theme)).toJson();

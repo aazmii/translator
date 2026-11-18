@@ -17,4 +17,8 @@ final class SettingsController extends AsyncNotifier<AppSettings> {
   Future<void> changeTheme(ThemeProfile theme) async {
     state = AsyncData(await ref.read(changeThemeProvider)(theme));
   }
+
+  Future<void> setKeyboardAtStartup(bool show) async {
+    state = AsyncData(await ref.read(setKeyboardAtStartupProvider)(show));
+  }
 }

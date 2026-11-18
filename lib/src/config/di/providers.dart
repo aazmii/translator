@@ -27,6 +27,7 @@ import '../../modules/setting/data/repositories/setting.repository.dart';
 import '../../modules/setting/domain/repositories/setting.repo.dart';
 import '../../modules/setting/domain/usecases/change_theme.dart';
 import '../../modules/setting/domain/usecases/get_settings.dart';
+import '../../modules/setting/domain/usecases/set_keyboard_at_startup.dart';
 
 /// Application composition root. Infrastructure implementations are wired to domain
 /// contracts here and nowhere in the presentation layer.
@@ -107,4 +108,7 @@ final getSettingsProvider = Provider<GetSettings>(
 );
 final changeThemeProvider = Provider<ChangeTheme>(
   (ref) => ChangeTheme(ref.watch(settingsRepositoryProvider)),
+);
+final setKeyboardAtStartupProvider = Provider<SetKeyboardAtStartup>(
+  (ref) => SetKeyboardAtStartup(ref.watch(settingsRepositoryProvider)),
 );
