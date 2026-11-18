@@ -9,6 +9,7 @@ import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tr
 import 'package:go_translator/src/modules/home/presentation/home.view/helpers/tts.helper.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.listening.dialog.dart';
 import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/speech.recognizer.dart';
+import 'package:go_translator/src/modules/home/presentation/home.view/components/speech.listening/system.speech.dialog.dart';
 
 import '../../providers/translator.dart';
 
@@ -22,6 +23,7 @@ class SourceActionPanel extends ConsumerStatefulWidget {
 
 class _ActionPanelState extends ConsumerState<SourceActionPanel> {
   final _flutterTts = FlutterTts();
+  final _systemSpeech = SystemSpeechDialog();
 
   @override
   Widget build(BuildContext context) {
@@ -126,13 +128,27 @@ class _ActionPanelState extends ConsumerState<SourceActionPanel> {
           ),
           IconButton(
             onPressed: () async {
-              // The dialog only returns text on Insert; nothing is written
-              // here while speaking.
-              final spoken = await showDialog<String>(
-                context: context,
-                barrierDismissible: false,
-                builder: (_) => SpeechListeningDialog(languageCode: sourceLanguageCode),
-              );
+              // Android: the system (Google) speech dialog, whose text goes
+              // straight in. If it fails, or elsewhere / with no Google app,
+              // the in-app dialog, which only returns text on Insert.
+              final String? spoken;
+              switch (await _systemSpeech.recognize(sourceLanguageCode)) {
+                case SystemSpeechText(:final text):
+                  spoken = text;
+                case SystemSpeechCancelled():
+                  return;
+                case SystemSpeechFailed(code: 'busy'):
+                  // A system dialog is already open; don't compete for the mic.
+                  debugPrint('Voice input: system dialog already open');
+                  return;
+                case SystemSpeechFailed() || SystemSpeechUnavailable():
+                  if (!context.mounted) return;
+                  spoken = await showDialog<String>(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (_) => SpeechListeningDialog(languageCode: sourceLanguageCode),
+                  );
+              }
               if (spoken == null || spoken.trim().isEmpty || !context.mounted) return;
               final text = appendDictation(widget.controller?.text ?? '', spoken);
               widget.controller?.value = TextEditingValue(
