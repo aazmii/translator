@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_translator/src/config/router/provider/route.provider.dart';
+import 'package:go_translator/src/core/widgets/app_mark.dart';
 import 'package:go_translator/src/modules/bookmarks/presentation/providers/bookmarks.controller.dart';
 import 'package:go_translator/src/modules/bookmarks/presentation/view/bookmarks.view.dart';
 import 'package:go_translator/src/modules/languages/presentation/providers/offline.languages.provider.dart';
@@ -107,12 +108,8 @@ class _Header extends StatelessWidget {
       padding: const EdgeInsets.only(top: 4),
       child: Row(
         children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(12)),
-            child: Icon(Icons.g_translate, size: 24, color: colors.onPrimary),
-          ),
+          // Same mark as the app bar and the launcher icon.
+          const AppMark(),
           const SizedBox(width: 8),
           Expanded(
             child: Column(

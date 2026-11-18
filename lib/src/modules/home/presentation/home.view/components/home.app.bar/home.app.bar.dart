@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_translator/src/core/widgets/app_mark.dart';
 
-/// The app bar of the pages with the drawer (translator, settings): menu
-/// (from the Scaffold's drawer), the app icon and [title]. On the translator
-/// page the languages live in the LanguageBar below it.
+/// The translator page's app bar (the only page with the drawer): menu (from
+/// the Scaffold's drawer), the app mark and [title]. The languages live in
+/// the LanguageBar below it.
 class HomeAppbar extends StatelessWidget implements PreferredSizeWidget {
   const HomeAppbar({super.key, this.title = 'Translator'});
 
