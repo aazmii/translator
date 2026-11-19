@@ -1,0 +1,76 @@
+# Release: pushing a version tag (for example v1.0.1) checks the code,
+# builds a release APK with that version, and publishes a GitHub Release
+# with the APK attached (repository page > Releases). Unlike the CI
+# artifacts, Releases are kept until deleted.
+#
+#   git tag v1.0.1
+#   git push origin v1.0.1
+#
+# The APK is still signed with the debug key until a release signing key
+# is added (see ROADMAP.md).
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+env:
+  # Same version as local development and CI.
+  FLUTTER_VERSION: "3.47.9"
+
+jobs:
+  test:
+    name: Analyze and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
+  release:
+    name: Build APK and publish the release
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # create the release and upload the APK
+    steps:
+      - uses: actions/checkout@v4
+
+      # AGP 8.11 / Gradle 8.14 need JDK 17 to run.
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # The tag sets the app's version: v1.0.1 -> versionName 1.0.1. The
+      # build number is this workflow's run number, so it always increases.
+      - name: Build release APK
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          flutter build apk --release --build-name="$VERSION" --build-number="${{ github.run_number }}"
+          cp build/app/outputs/flutter-apk/app-release.apk "go-translator-$GITHUB_REF_NAME.apk"
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: go-translator-${{ github.ref_name }}.apk
+          generate_release_notes: true
+          fail_on_unmatched_files: true
