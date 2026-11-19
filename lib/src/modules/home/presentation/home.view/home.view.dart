@@ -51,23 +51,3 @@ class HomeView extends StatelessWidget {
 //     );
 //   }
 // }
-
-class InheritedNose extends InheritedWidget {
-  final Image asset;
-  const InheritedNose({super.key, required Widget child, required this.asset}) : super(child: child);
-
-  @override
-  bool updateShouldNotify(covariant InheritedWidget oldWidget) {
-    return true;
-  }
-}
-
-class HelloWidget extends StatelessWidget {
-  const HelloWidget({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final nose = context.dependOnInheritedWidgetOfExactType<InheritedNose>();
-    return const Placeholder();
-  }
-}
